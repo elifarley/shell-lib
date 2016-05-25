@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+jenkins_docker_push() {
+  (( $# == 4 )) || {
+    printf 'Parameters:\n\nREPO_PREFIX\nUPSTREAM_JOB_NAME\nUPSTREAM_BUILD_NUMBER\nCHANGESET'
+    return 1
+  }
+
+  local REPO_PREFIX="$1"; shift
+  local UPSTREAM_JOB_NAME="$1"; shift
+  local UPSTREAM_BUILD_NUMBER="$1"; shift
+  local CHANGESET="$1"; shift
+
+  REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME"
+  docker build --pull -t "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" .
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest"
+  docker push "$REPO_PREFIX-latest"
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER"
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"                                                                                                                          
+}  
+
+jenkins_docker_push "$@"
