@@ -12,12 +12,15 @@ jenkins_docker_push() {
   local CHANGESET="$1"; shift
 
   REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME"
-  docker build --pull -t "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" .
+  echo "Building '$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)'..."
+  time docker build --pull -t "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" .
   docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
   docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest"
+  echo "Pushing 3 tags..."
   docker push "$REPO_PREFIX-latest"
   docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER"
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"                                                                                                                          
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
+  echo $0: Done.
 }  
 
 jenkins_docker_push "$@"
