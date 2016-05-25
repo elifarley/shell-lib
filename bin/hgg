@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# See http://stackoverflow.com/questions/4114095/revert-git-repo-to-a-previous-commit
+# See https://github.com/sympy/sympy/wiki/Git-hg-rosetta-stone
+# See http://stackoverflow.com/questions/1450348/git-equivalents-of-most-common-mercurial-commands
+
+hg_emu() {
+  local hgcmd="$1"; shift
+  case "$hgcmd" in
+    ci|commit)
+      hg_commit "$@"
+      ;;
+    config|showconfig|debugconfig|conf)
+      hg_config "$@"
+      ;;
+    man|mani|manifest)
+      hg_manifest "$@"
+      ;;
+    revert)
+      hg_revert "$@"
+      ;;
+    par|parent|parents)
+      hg_parents "$@"
+      ;;
+    path|paths)
+      hg_paths "$@"
+      ;;
+    pull)
+      hg_pull "$@"
+      ;;
+    st|status)
+      hg_status "$@"
+      ;;
+    up|update)
+      hg_update "$@"
+      ;;
+    *)
+      git $hgcmd "$@"
+  esac
+}
+
+hg_commit() {
+  git commit -a "$@"
+}
+
+hg_config() {
+  local params=("$@")
+  test $# -eq 0 && params=(--list) || {
+    params=("${params[@]/#-l/--local}")
+    params=("${params[@]/#-g/--global}")
+    params=("${params[@]/#--debug/--show-origin}")
+  }
+  git config "${params[@]}"
+}
+
+hg_manifest() {
+  git ls-tree -r --name-only --full-tree HEAD
+}
+
+hg_parents() {
+  git show --pretty=format:'%P' -s
+}
+
+hg_paths() {
+  git remote -v
+}
+
+hg_pull() {
+  local params=("$@")
+  params=("${params[@]/#-u/--update}")
+  [[ " ${params[@]} " =~ " --update " ]] && {
+    local p2=()
+    for item in "${params[@]}"; do
+      test "$item" = '--update' || p2+=("$item")
+    done
+    params=(pull "${p2[@]}")
+  } || {
+    params=("${params[@]/#-r/--rev}")
+    [[ " ${params[@]} " =~ " --rev " ]] && {
+      local p2=()
+      for item in "${params[@]}"; do
+        test "$item" = '--rev' && skip=x1x || {
+          test "$skip" = 'x1x' && skip="$item" || p2+=("$item")
+        }
+      done
+      params=(fetch "${p2[@]}" "$skip")
+    } || params=(fetch --all "${params[@]}")
+  }
+  git "${params[@]}"
+}
+
+hg_revert() {   
+  case "$@" in  
+    '-a')          
+      git reset --hard
+      ;;           
+    '-a -r '*)  
+      local rev="$3"; shift 3
+      git reset --hard "$rev" --
+      ;;           
+    *)             
+      echo hg_revert: TODO; return 1
+  esac             
+}
+
+hg_status() {
+  test "$2" = '-c' && git ls-files -t | grep '^H' || git status
+}
+
+hg_update() {
+  local p1="$1"; shift
+  case "$p1" in
+    '-C')
+      local p2="$1"; shift
+      test "$p2" = '.' && p2=''
+      git checkout -f $p2
+      ;;
+    *)
+      echo hg_revert: TODO; return 1
+  esac
+}
+
+hg_emu "$@"
