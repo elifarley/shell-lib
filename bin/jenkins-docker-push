@@ -13,13 +13,13 @@ jenkins_docker_push() {
 
   REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME"
   echo "Building '$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)'..."
-  time docker build --pull -t "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" .
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest"
+  time docker build --pull -t "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" . || return $?
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return $?
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest" || return $?
   echo "Pushing 3 tags..."
-  docker push "$REPO_PREFIX-latest"
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER"
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
+  docker push "$REPO_PREFIX-latest" || return $?
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return $?
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return $?
   echo $0: Done.
 }  
 
