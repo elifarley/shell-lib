@@ -8,6 +8,8 @@ archive_artifacts() {
   }
   shift
 
+  test -d "$archive_target"/target && archive_target="$archive_target"/target
+
   adir="$(mktemp -d --tmpdir "$JOB_NAME".XXXXXXX)"
   test -d "$adir" || return 1
 
