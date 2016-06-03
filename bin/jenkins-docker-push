@@ -11,10 +11,11 @@ docker_build_archive() {
   local context_archive="$context_root"/app.tgz
 
   if test -s "$context_archive"; then
-    cat "$context_archive" | docker_build "$tag" "$@"
+    cat "$context_archive" | docker_build "$tag" "$@" - || return
   else
-    docker_build "$tag" "$context_root"
+    docker_build "$tag" "$@" "$context_root" || return
   fi
+
 }
 
 jenkins_docker_push() {
