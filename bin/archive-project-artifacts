@@ -23,4 +23,6 @@ archive_artifacts() {
 
 }
 
+test "$DEBUG" && set -x
+
 archive_artifacts "$@"
