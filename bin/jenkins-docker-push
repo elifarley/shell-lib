@@ -10,7 +10,7 @@ docker_build_archive() {
   local context_root="${1:-.}"; shift
   local context_archive="$context_root"/app.tgz
 
-  if test -s "$context_archive" then;
+  if test -s "$context_archive"; then
     cat "$context_archive" | docker_build "$tag" "$@"
   else
     docker_build "$tag" "$context_root"
