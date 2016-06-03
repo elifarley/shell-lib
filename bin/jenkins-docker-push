@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
 
+docker_build() {
+  local tag="$1"; shift
+  time docker build --pull -t "$tag" "$@"
+}
+
+docker_build_archive() {
+  local tag="$1"; shift
+  local context_root="${1:-.}"; shift
+  local context_archive="$context_root"/app.tgz
+
+  if test -s "$context_archive" then;
+    cat "$context_archive" | docker_build "$tag" "$@"
+  else
+    docker_build "$tag" "$context_root"
+  fi
+}
+
 jenkins_docker_push() {
   (( $# == 4 )) || {
     printf 'Parameters:\n\nREPO_PREFIX\nUPSTREAM_JOB_NAME\nUPSTREAM_BUILD_NUMBER\nCHANGESET'
@@ -13,13 +30,13 @@ jenkins_docker_push() {
 
   REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME"
   echo "Building '$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)'..."
-  time docker build --pull -t "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" . || return $?
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return $?
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest" || return $?
+  docker_build_archive "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest" || return
   echo "Pushing 3 tags..."
-  docker push "$REPO_PREFIX-latest" || return $?
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return $?
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return $?
+  docker push "$REPO_PREFIX-latest" || return
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return
   echo $0: Done.
 }  
 
