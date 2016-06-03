@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 archive_artifacts() {
-  local project_root="$1"; shift
+  local project_root="${1:-.}"; shift
+  test "$project_root" = '.' && project_root="$(pwd)"
 
   adir="$(mktemp -d --tmpdir "$JOB_NAME".XXXXXXX)"
   test -d "$adir" || return 1
@@ -9,7 +10,7 @@ archive_artifacts() {
   tar -zcf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
     --exclude-vcs-ignores --exclude-vcs \
     --exclude-backups --exclude-caches \
-    -C "$project_root" . && \
+    -C "$(dirname "$project_root")" "$(basename "$project_root")" && \
   mv "$adir"/app.tgz . && \
   rm -rf "$adir" || \
   { rm -rf "$adir"; return 1 ;}
