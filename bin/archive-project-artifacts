@@ -7,7 +7,7 @@ archive_artifacts() {
   adir="$(mktemp -d --tmpdir "$JOB_NAME".XXXXXXX)"
   test -d "$adir" || return 1
 
-  tar -zcf "$adir"/app.tgz --exclude app.tgz --exclude-ignore="$project_root"/.dockerignore \
+  tar -zcvf "$adir"/app.tgz --exclude app.tgz --exclude-ignore="$project_root"/.dockerignore \
     --exclude-vcs-ignores --exclude-vcs \
     --exclude-backups --exclude-caches \
     -C "$project_root" . && \
