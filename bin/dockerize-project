@@ -37,8 +37,10 @@ generate_dockerfile_and_archive() {
     jvm)
       dockerfile_dir="$project_root"/target
       local jars=("$project_root"/target/*.jar)
-      tar_params+=("${jars[@]#"$project_root"/target/}")
-      unset jars
+      test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$project_root"/target/}") || {
+        mv "$project_root"/target/*.jar "$project_root"/target/app.jar || return
+        tar_params+=(app.jar)
+      }
       ;;
   esac
 
