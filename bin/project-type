@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
+. "$CMD_BASE"/../lib/shell-dev
+
+detect_project_type() {
+  local project_root="$(readlink -f "${1:-.}")"; shift
+  local ptypefun
+  for ptype in jvm ruby python; do
+    ptypefun="detect_project_$ptype"
+    hascmd "$ptypefun" || continue
+    eval "$ptypefun" && echo $ptype && return
+  done
+  return 1
+}
+
+detect_project_ruby() {
+  test -f "${1:-.}"/Gemfile
+}
+
+get_rails_version() {
+  local project_root="$(readlink -f "${1:-.}")"
+  egrep "gem 'rails', '[0-9.]+'" "$project_root"/Gemfile | cut -d',' -f2 | tr -d "' \n' '_'"
+}
+
+test "$DEBUG" && set -x
+detect_project_type "$@"
