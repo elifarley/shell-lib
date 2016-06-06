@@ -7,6 +7,7 @@ generate_dockerfiles() {
   local ptype="$1"; shift
 
   cat >"$dockerfile_dir"/.dockerignore <<EOF
+**~
 .idea
 target
 coverage
