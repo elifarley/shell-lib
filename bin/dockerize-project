@@ -10,6 +10,9 @@ generate_dockerfiles() {
 .idea
 target
 coverage
+test
+.rspec
+.rubocop*
 **.log
 EOF
 
