@@ -2,34 +2,53 @@
 CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
 PATH="$CMD_BASE:$PATH"
 
-generate_dockerfile() {
-  local project_root="$(readlink -f "${1:-.}")"; shift
-  case "$(project-type "$project_root")" in
+generate_dockerfiles() {
+  local dockerfile_dir="$(readlink -f "${1:-.}")"; shift
+  local ptype="$1"; shift
+
+  test -f "$dockerfile_dir"/Dockerfile && return
+
+  case "$ptype" in
     ruby)
-      echo TODO
+      image_parent='elifarley/docker-rails:rails-4.2.5.1'
       ;;
     jvm)
-      echo TODO
+      image_parent='elifarley/docker-dev-env:debian-openjdk-8-onbuild'
       ;;
     *)
-      echo "$@"
+      return 1
   esac
+
+  printf "FROM %s\nMAINTAINER github.com/elifarley/shell-lib\n#\n" "$image_parent" > \
+    "$dockerfile_dir"/Dockerfile
 }
 
 generate_dockerfile_and_archive() {
   local project_root="$(readlink -f "${1:-.}")"; shift
+  local ptype="$(project-type "$project_root")"
 
-  case "$(project-type "$project_root")" in
+  local dockerfile_dir="$project_root"
+  local tar_params=()
+  case "$ptype" in
     ruby)
-      archive-project-artifacts "$project_root" . "$@"
+      tar_params+=(.)
       ;;
     jvm)
-      archive-project-artifacts "$project_root"/target/*.?ar "$@"
+      dockerfile_dir="$project_root"/target
+      local jars=("$project_root"/target/*.jar)
+      tar_params+=("${jars[@]#"$project_root"/target/}")
+      unset jars
       ;;
-    *)
-      echo "$@"
   esac
+
+  test -f "$dockerfile_dir"/Dockerfile || test -f "$project_root"/Dockerfile && \
+    cp "$project_root"/Dockerfile "$dockerfile_dir"
+  test -f "$dockerfile_dir"/.dockerignore || test -f "$project_root"/.dockerignore && \
+    cp "$project_root"/.dockerignore "$dockerfile_dir"
+
+  generate_dockerfiles "$dockerfile_dir" "$ptype" && \
+  archive-project-artifacts "$dockerfile_dir" . "${tar_params[@]}"
 }
 
 test "$DEBUG" && set -x
-archive_artifacts "$@"
+generate_dockerfile_and_archive "$@"
