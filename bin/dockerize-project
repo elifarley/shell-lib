@@ -29,9 +29,10 @@ generate_dockerfile_and_archive() {
 
   local dockerfile_dir="$project_root"
   local tar_params=()
+  local all_included=''
   case "$ptype" in
     ruby)
-      tar_params+=(.)
+      tar_params+=(.); all_included=T
       ;;
     jvm)
       dockerfile_dir="$project_root"/target
@@ -46,7 +47,13 @@ generate_dockerfile_and_archive() {
   test -f "$dockerfile_dir"/.dockerignore || test -f "$project_root"/.dockerignore && \
     cp "$project_root"/.dockerignore "$dockerfile_dir"
 
-  generate_dockerfiles "$dockerfile_dir" "$ptype" && \
+  generate_dockerfiles "$dockerfile_dir" "$ptype" || return
+
+  test "$all_included" || {
+    test -f "$dockerfile_dir"/Dockerfile && tar_params+=(Dockerfile)
+    test -f "$dockerfile_dir"/.dockerignore && tar_params+=(.dockerignore)
+  }
+
   archive-project-artifacts "$dockerfile_dir" . "${tar_params[@]}"
 }
 
