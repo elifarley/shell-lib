@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
+PATH="$CMD_BASE:$PATH"
+
+generate_dockerfile() {
+  local project_root="$(readlink -f "${1:-.}")"; shift
+  case "$(project-type "$project_root")" in
+    ruby)
+      echo TODO
+      ;;
+    jvm)
+      echo TODO
+      ;;
+    *)
+      echo "$@"
+  esac
+}
+
+generate_dockerfile_and_archive() {
+  local project_root="$(readlink -f "${1:-.}")"; shift
+
+  case "$(project-type "$project_root")" in
+    ruby)
+      archive-project-artifacts "$project_root" . "$@"
+      ;;
+    jvm)
+      archive-project-artifacts "$project_root"/target/*.?ar "$@"
+      ;;
+    *)
+      echo "$@"
+  esac
+}
+
+test "$DEBUG" && set -x
+archive_artifacts "$@"
