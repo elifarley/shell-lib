@@ -15,7 +15,7 @@ archive_artifacts() {
 
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
     --exclude-vcs --exclude-backups --exclude-caches \
-    -C "$project_root" . && \
+    -C "$project_root" "$@" && \
   mv "$adir"/app.tgz "$archive_target" && \
   rm -rf "$adir" || \
   { rm -rf "$adir"; return 1 ;}
