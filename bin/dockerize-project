@@ -11,6 +11,7 @@ generate_dockerfiles() {
 .idea
 target
 coverage
+spec
 test
 .rspec
 .rubocop*
