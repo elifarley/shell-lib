@@ -5,7 +5,7 @@ CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
 detect_project_type() {
   local project_root="$(readlink -f "${1:-.}")"; shift
   local ptypefun
-  for ptype in jvm ruby python; do
+  for ptype in ruby jvm python; do
     ptypefun="detect_project_$ptype"
     hascmd "$ptypefun" || continue
     eval "$ptypefun" && echo $ptype && return
@@ -18,8 +18,19 @@ detect_project_ruby() {
 }
 
 get_rails_version() {
-  local project_root="$(readlink -f "${1:-.}")"
-  egrep "gem 'rails', '[0-9.]+'" "$project_root"/Gemfile | cut -d',' -f2 | tr -d "' \n' '_'"
+  egrep "gem 'rails', '[0-9.]+'" "${1:-.}"/Gemfile | cut -d',' -f2 | tr -d "' \n' '_'"
+}
+
+detect_project_jvm() {
+  test "$(ls 2>/dev/null -A "${1:-.}"/target/*.?ar)" || \
+  test -f "${1:-.}"/pom.xml || \
+  test -f "${1:-.}"/build.gradle
+}
+
+detect_project_python() {
+  test "$(ls 2>/dev/null -A "${1:-.}"/*.py)" || \
+  grep 2>/dev/null -q 'pip ' "${1:-.}"/Makefile || \
+  test -f "${1:-.}"/requirements.txt
 }
 
 test "$DEBUG" && set -x
