@@ -44,9 +44,11 @@ generate_dockerfile_and_archive() {
       ;;
   esac
 
-  test -f "$dockerfile_dir"/Dockerfile || test -f "$project_root"/Dockerfile && \
+  test "$project_root" != "$dockerfile_dir" && test -f "$dockerfile_dir"/Dockerfile || \
+    test -f "$project_root"/Dockerfile && \
     cp "$project_root"/Dockerfile "$dockerfile_dir"
-  test -f "$dockerfile_dir"/.dockerignore || test -f "$project_root"/.dockerignore && \
+  test "$project_root" != "$dockerfile_dir" && test -f "$dockerfile_dir"/.dockerignore || \
+    test -f "$project_root"/.dockerignore && \
     cp "$project_root"/.dockerignore "$dockerfile_dir"
 
   generate_dockerfiles "$dockerfile_dir" "$ptype" || return
