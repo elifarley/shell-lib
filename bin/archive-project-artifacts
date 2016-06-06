@@ -10,7 +10,7 @@ archive_artifacts() {
 
   test -d "$archive_target"/target && archive_target="$archive_target"/target
 
-  adir="$(mktemp -d --tmpdir "$JOB_NAME".XXXXXXX)"
+  adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$JOB_NAME".XXXXXXX)"
   test -d "$adir" || return 1
 
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
