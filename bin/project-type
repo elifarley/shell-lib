@@ -28,7 +28,7 @@ detect_project_jvm() {
 }
 
 detect_project_nodejs() {
-  test -f "${1:-.}"/package.json
+  test -f "${1:-.}"/package.json || test -f "${1:-.}"/app.js
 }
 
 detect_project_python() {
