@@ -46,7 +46,7 @@ generate_dockerfile_and_archive() {
   local tar_params=()
   local all_included=''
   case "$ptype" in
-    ruby)
+    ruby|nodejs)
       tar_params+=(.); all_included=T
       ;;
     jvm)
