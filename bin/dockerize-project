@@ -27,6 +27,9 @@ EOF
     jvm)
       image_parent='elifarley/docker-dev-env:debian-openjdk-8-onbuild'
       ;;
+    nodejs)
+      image_parent='elifarley/docker-dev-env:debian-node-onbuild'
+      ;;
     *)
       return 1
   esac
