@@ -1,5 +1,3 @@
-pss() { ps -o pid,user,c,start,args -C "$1" --cols 2000 "$@" ;}
-
 STDERR() { cat - 1>&2; }
 
 hex2bytes () {
