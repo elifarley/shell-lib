@@ -23,9 +23,11 @@ archive_artifacts() {
   test -d "$adir" || return 1
 
   build_info >> "$project_root"/build-info.txt
+  local extra_tar_items; test "$*" = '.' || extra_tar_items=build-info.txt
+
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
     --exclude-vcs --exclude-backups --exclude-caches \
-    -C "$project_root" "$@" && \
+    -C "$project_root" $extra_tar_items "$@" && \
   mv "$adir"/app.tgz "$archive_target" && \
   rm -rf "$adir" || \
   { rm -rf "$adir"; return 1 ;}
