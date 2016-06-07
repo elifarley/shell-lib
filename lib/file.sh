@@ -3,6 +3,8 @@ some_file() { local base="$1"; shift; find "$base" ! -path "$base" "$@" -print -
 
 dir_full() { local base="$1"; shift; test "$(cd "$base" &>nul && find . -maxdepth 1 ! -path . "$@" -print -quit)"; }
 
+dir_not_empty() { test "$(ls -A "$@" 2>/dev/null)" ;}
+
 dir_empty() { find "$1" -maxdepth 0 -empty | read v ;}
 
 dir_count() { test -d "$1" && echo $(( $(\ls -afq "$1" 2>/dev/null | wc -l )  -2 )) ;}
