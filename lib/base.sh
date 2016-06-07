@@ -1,5 +1,3 @@
-STDERR() { cat - 1>&2; }
-
 hex2bytes () {
   local b=0; while (( b < ${#1} )) ; do
   printf "\\x${1:$b:2}"; ((b += 2)); done
@@ -22,8 +20,6 @@ millistamp_b64() { millistamp_hex | hex2b64 ;}
 mkrandom() { base64 -w0 /dev/urandom | tr -d "/+${2:-0Oo}" | dd bs="${1:-8}" count=1 2>/dev/null | xargs ;}
 mkrandomL() { mkrandom "$@" | tr '[[:upper:]]' '[[:lower:]]' ;}
 mkrandomU() { mkrandom "$@" | tr '[[:lower:]]' '[[:upper:]]' ;}
-
-exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
 
 wait_file() {
   local file="$1"; shift
@@ -67,21 +63,21 @@ ht_get() {
   echo "$result"
 }
 
-pause() { echo 'Pressione [ENTER] para continuar...'; read; }
+pause() { echo 'Press [ENTER] to continue...'; read; }
 ask() { echo -en "$1 "; shift; read "$@"; }
 
 confirm() {
   local msg="$1"; shift
   local proceed
-  ask "${msg:-Confirma?} [S/n]" proceed
+  ask "${msg:-Confirm?} [Y/n]" proceed
   test "$(echo $proceed | tr [:upper:] [:lower:])" != n || exit 1
 }
 
 areYouSure() {
   local msg="$1"; shift
   local proceed
-  ask "${msg:-Tem certeza de que deseja prosseguir?} [tenho/N]" proceed
-  test "$(echo $proceed | tr [:upper:] [:lower:])" = tenho || exit 1
+  ask "${msg:-Are you sure you want to proceed?} [yes/N]" proceed
+  test "$(echo $proceed | tr [:upper:] [:lower:])" = yes || exit 1
 }
 
 create_empty_zip() {
@@ -89,15 +85,6 @@ create_empty_zip() {
   rmdir_if_exists "$1" || return $?
   "$JAVA_HOME"/bin/jar Mcvf "$1" no-file 2> nul
   test -e "$1"
-}
-
-get_array_index() {
-  local -r key="$1"; shift
-  local -i index=0
-  while test $# -gt 0; do
-    test "$1" = "$key" && echo $index && break
-    index+=1; shift
-  done
 }
 
 foreachline() {
