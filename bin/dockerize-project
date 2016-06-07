@@ -60,19 +60,20 @@ generate_dockerfile_and_archive() {
       ;;
   esac
 
-  test "$project_root" != "$dockerfile_dir" && test -f "$dockerfile_dir"/Dockerfile || \
-    test -f "$project_root"/Dockerfile && \
-    cp "$project_root"/Dockerfile "$dockerfile_dir"
-  test "$project_root" != "$dockerfile_dir" && test -f "$dockerfile_dir"/.dockerignore || \
-    test -f "$project_root"/.dockerignore && \
-    cp "$project_root"/.dockerignore "$dockerfile_dir"
+  local extra_files='Dockerfile .dockerignore'
+  test "$project_root" != "$dockerfile_dir" && \
+    for item in $extra_files; do
+      test -f "$dockerfile_dir/$item" && continue
+      test -f "$project_root/$item" || continue
+      cp -v "$project_root/$item" "$dockerfile_dir"
+    done
 
   generate_dockerfiles "$dockerfile_dir" "$ptype" || return
 
-  test "$all_included" || {
-    test -f "$dockerfile_dir"/Dockerfile && tar_params+=(Dockerfile)
-    test -f "$dockerfile_dir"/.dockerignore && tar_params+=(.dockerignore)
-  }
+  test "$all_included" || \
+    for item in $extra_files; do
+      test -f "$dockerfile_dir/$item" && tar_params+=("$item")
+    done
 
   archive-project-artifacts "$dockerfile_dir" . "${tar_params[@]}"
 }
