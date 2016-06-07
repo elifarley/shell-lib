@@ -27,6 +27,10 @@ detect_project_jvm() {
   test -f "${1:-.}"/build.gradle
 }
 
+detect_project_nodejs() {
+  test -f "${1:-.}"/package.json
+}
+
 detect_project_python() {
   test "$(ls 2>/dev/null -A "${1:-.}"/*.py)" || \
   grep 2>/dev/null -q 'pip ' "${1:-.}"/Makefile || \
