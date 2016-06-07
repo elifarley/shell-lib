@@ -41,7 +41,7 @@ jenkins_docker_push() {
   printf '\n\n%s\n%s\n' \
     "To pull this image, type:" \
     "docker pull $REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
-  printf '\n\n$0: Done.\n'
+  printf "\n\n$0: Done.\n"
 }  
 
 jenkins_docker_push "$@"
