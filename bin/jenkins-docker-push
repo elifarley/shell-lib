@@ -38,7 +38,10 @@ jenkins_docker_push() {
   docker push "$REPO_PREFIX-latest" || return
   docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
   docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return
-  echo $0: Done.
+  printf '\n\n%s\n%s\n' \
+    "To pull this image, type:" \
+    "docker pull $REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
+  printf '\n\n$0: Done.\n'
 }  
 
 jenkins_docker_push "$@"
