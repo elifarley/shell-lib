@@ -6,6 +6,7 @@ build_info() {
   echo "DVCS_URL='$GIT_URL'"
   echo "DVCS_NODE='$GIT_COMMIT'"
   echo "DVCS_BRANCH='$GIT_BRANCH'"
+  test "$PROJECT_TYPE" && echo "PROJECT_TYPE='$PROJECT_TYPE'"
 }
 
 archive_artifacts() {
