@@ -1,3 +1,16 @@
+STDERR() { cat - 1>&2; }
+
+exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
+
+get_array_index() {
+  local -r key="$1"; shift
+  local -i index=0
+  while test $# -gt 0; do
+    test "$1" = "$key" && echo $index && break
+    index+=1; shift
+  done
+}
+
 # Prints only a word to describe the type of the first argument
 # (alias, builtin, function, file)
 typeof() {
