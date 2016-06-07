@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
-. "$CMD_BASE"/../lib/shell-dev
+for lib in base file
+  do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 detect_project_type() {
   local project_root="$(readlink -f "${1:-.}")"; shift
@@ -32,9 +33,9 @@ detect_project_nodejs() {
 }
 
 detect_project_python() {
-  test "$(ls 2>/dev/null -A "${1:-.}"/*.py)" || \
-  grep 2>/dev/null -q 'pip ' "${1:-.}"/Makefile || \
-  test -f "${1:-.}"/requirements.txt
+  dir_not_empty "${1:-.}"/*.py || \
+  test -f "${1:-.}"/requirements.txt || \
+  grep 2>/dev/null -q 'pip ' "${1:-.}"/Makefile
 }
 
 test "$DEBUG" && set -x
