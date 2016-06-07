@@ -11,6 +11,8 @@ get_array_index() {
   done
 }
 
+hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
+
 # Prints only a word to describe the type of the first argument
 # (alias, builtin, function, file)
 typeof() {
@@ -30,5 +32,3 @@ typeof() {
   echo $result
 
 }
-
-hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
