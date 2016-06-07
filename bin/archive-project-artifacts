@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+build_info() {
+  printf 'BUILD_DATE: %s %s\n' "$(date +'%F %T.%N')" "$(date +%Z)"
+  echo "BUILD_URL='$BUILD_URL'"
+  echo "DVCS_URL='$GIT_URL'"
+  echo "DVCS_NODE='$GIT_COMMIT'"
+  echo "DVCS_BRANCH='$GIT_BRANCH'"
+}
+
 archive_artifacts() {
   local project_root="$(readlink -f "${1:-.}")"; shift
   local archive_target; archive_target="$(readlink -f "${1:-.}")" || {
@@ -13,6 +21,7 @@ archive_artifacts() {
   adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$JOB_NAME".XXXXXXX)"
   test -d "$adir" || return 1
 
+  build_info >> "$project_root"/build-info.txt
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
     --exclude-vcs --exclude-backups --exclude-caches \
     -C "$project_root" "$@" && \
@@ -23,5 +32,4 @@ archive_artifacts() {
 }
 
 test "$DEBUG" && set -x
-
 archive_artifacts "$@"
