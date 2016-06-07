@@ -23,7 +23,7 @@ get_rails_version() {
 }
 
 detect_project_jvm() {
-  test "$(ls 2>/dev/null -A "${1:-.}"/target/*.?ar)" || \
+  dir_not_empty "${1:-.}"/target/*.?ar || \
   test -f "${1:-.}"/pom.xml || \
   test -f "${1:-.}"/build.gradle
 }
