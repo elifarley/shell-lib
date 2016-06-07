@@ -41,6 +41,7 @@ EOF
 generate_dockerfile_and_archive() {
   local project_root="$(readlink -f "${1:-.}")"; shift
   local ptype="$(project-type "$project_root")"
+  export PROJECT_TYPE="$ptype"
 
   local dockerfile_dir="$project_root"
   local tar_params=()
