@@ -8,6 +8,8 @@ generate_dockerfiles() {
 
   cat >"$dockerfile_dir"/.dockerignore <<EOF
 **~
+**.DS_Store
+**.log
 .idea
 target
 coverage
@@ -15,7 +17,6 @@ spec
 test
 .rspec
 .rubocop*
-**.log
 EOF
 
   test -f "$dockerfile_dir"/Dockerfile && return
