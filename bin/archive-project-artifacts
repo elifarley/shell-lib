@@ -2,6 +2,7 @@
 
 build_info() {
   printf 'BUILD_DATE="%s %s"\n' "$(date +'%F %T.%N')" "$(date +%Z)"
+  printf "BUILD_MONIKER='%s-%.7s'\n" "$JOB_NAME" "$GIT_COMMIT"
   echo "BUILD_URL='$BUILD_URL'"
   echo "DVCS_URL='$GIT_URL'"
   echo "DVCS_NODE='$GIT_COMMIT'"
