@@ -30,17 +30,17 @@ jenkins_docker_push() {
   local CHANGESET="$1"; shift
 
   REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME"
-  echo "Building '$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)'..."
+  echo "Building '$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")'..."
   docker_build_archive "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return
+  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")" || return
   docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest" || return
   echo "Pushing 3 tags..."
   docker push "$REPO_PREFIX-latest" || return
   docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)" || return
+  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")" || return
   printf '\n\n%s\n%s\n' \
     "To pull this image, type:" \
-    "docker pull $REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(echo $CHANGESET|cut -c1-7)"
+    "docker pull $REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")"
   printf "\n\n$0: Done.\n"
 }  
 
