@@ -1,3 +1,13 @@
+hex2decimal() { printf '%u' "0x$1"; echo ;}
+
+# Each element must be a number in [0-255], like '192.168.0.255'
+# Example: dotdecimal2hex 192.168.0.255 2
+# $1 - Input number in dot-decimal notation
+# $2 - Number of chars in output for each group (default: 2)
+dotdecimal2hex() { printf "%0${2:-2}x" ${1//./ }; echo ;}
+
+dotdecimal2decimal() { printf "%0${2:-3}u" ${1//./ }; echo ;}
+
 hex2bytes () {
   local b=0; while (( b < ${#1} )) ; do
   printf "\\x${1:$b:2}"; ((b += 2)); done
