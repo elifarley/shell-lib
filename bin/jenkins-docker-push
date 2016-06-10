@@ -27,21 +27,30 @@ jenkins_docker_push() {
   local REPO_PREFIX="$1"; shift
   local UPSTREAM_JOB_NAME="$1"; shift
   local UPSTREAM_BUILD_NUMBER="$1"; shift
-  local CHANGESET="$1"; shift
+  local CHANGESET="$1"
 
-  REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME"
-  echo "Building '$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")'..."
-  docker_build_archive "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")" || return
-  docker tag "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" "$REPO_PREFIX-latest" || return
+  REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME."
+  local REPO_PREFIX_BN="${REPO_PREFIX}$UPSTREAM_BUILD_NUMBER"
+  local REPO_PREFIX_CS="$REPO_PREFIX_BN-$(printf '%.7s' "$CHANGESET")"
+
+  echo "Building '$REPO_PREFIX_CS'..."
+  docker_build_archive "$REPO_PREFIX_BN" || return
+  docker tag "$REPO_PREFIX_BN" "$REPO_PREFIX_CS" || return
+  docker tag "$REPO_PREFIX_BN" "${REPO_PREFIX}latest" || return
+
   echo "Pushing 3 tags..."
-  docker push "$REPO_PREFIX-latest" || return
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER" || return
-  docker push "$REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")" || return
-  printf '\n\n%s\n%s\n' \
-    "To pull this image, type:" \
-    "docker pull $REPO_PREFIX-$UPSTREAM_BUILD_NUMBER-$(printf '%.7s' "$CHANGESET")"
-  printf "\n\n$0: Done.\n"
+  docker push "${REPO_PREFIX}latest" || return
+  docker push "$REPO_PREFIX_BN" || return
+  docker push "$REPO_PREFIX_CS" || return
+
+  cat <<EOF
+
+To pull this image, type:
+docker pull $REPO_PREFIX_CS
+
+
+$0: Done.
+EOF
 }  
 
 jenkins_docker_push "$@"
