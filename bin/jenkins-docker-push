@@ -1,13 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 docker_build() {
-  local tag="$1"; shift
+  local tag="$1"; test $# -eq 0 || shift
   time docker build --pull -t "$tag" "$@"
 }
 
 docker_build_archive() {
   local tag="$1"; shift
-  local context_root="${1:-.}"; shift
+  local context_root="${1:-.}"; test $# -eq 0 || shift
   local context_archive="$context_root"/app.tgz
 
   if test -s "$context_archive"; then
@@ -19,7 +19,7 @@ docker_build_archive() {
 }
 
 jenkins_docker_push() {
-  (( $# == 4 )) || {
+  test $# -eq 4 || {
     printf 'Parameters:\n\nREPO_PREFIX\nUPSTREAM_JOB_NAME\nUPSTREAM_BUILD_NUMBER\nCHANGESET'
     return 1
   }
