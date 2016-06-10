@@ -53,4 +53,5 @@ $0: Done.
 EOF
 }  
 
+test "$DEBUG" && set -x
 jenkins_docker_push "$@"
