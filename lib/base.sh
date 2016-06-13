@@ -13,11 +13,30 @@ get_array_index() {
 
 hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
 
+# Examples:
+# shell_name 'ash*' && echo "Ash or one of its variants"
+# shell_name (prints the shell name when no args)
 shell_name() {
   # Try readlink /proc/$$/exe
-  type --help >/dev/null 2>&1 && echo 'ash-busybox' && return
-  type -t >/dev/null 2>&1 && echo 'bash' && return
-  test "${SHELL##*/}" && echo ${SHELL##*/} && return
+  local result;
+  if
+    type --help >/dev/null 2>&1; then result='ash-busybox'
+  elif
+    type -t >/dev/null 2>&1; then result='bash'
+  elif
+    test "${SHELL##*/}"; then result="${SHELL##*/}"
+  fi
+
+  test $# -eq 0 && {
+    test "$result" && echo $result
+    return
+  }
+
+  case "$result" in
+    $1) return;;
+  esac
+  return 1
+
 }
 
 # Prints only a word to describe the type of the first argument
