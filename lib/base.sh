@@ -14,6 +14,7 @@ get_array_index() {
 hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
 
 shell_name() {
+  # Try readlink /proc/$$/exe
   type --help >/dev/null 2>&1 && echo 'ash-busybox' && return
   type -t >/dev/null 2>&1 && echo 'bash' && return
   test "${SHELL##*/}" && echo ${SHELL##*/} && return
