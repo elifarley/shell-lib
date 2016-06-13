@@ -44,7 +44,7 @@ rmdir_if_exists() {
     echo "Removing '$p'"
     rm -r "$p" || return $?
   done
-}; export -f rmdir_if_exists
+}; test "$(shell_name)" = 'bash' && export -f rmdir_if_exists
 
 rmexp_if_exists() {
   # TODO make it work with paths that include spaces
