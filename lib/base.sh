@@ -13,11 +13,17 @@ get_array_index() {
 
 hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
 
+shell_name() {
+  type --help >/dev/null 2>&1 && echo 'ash-busybox' && return
+  type -t >/dev/null 2>&1 && echo 'bash' && return
+  test "${SHELL##*/}" && echo ${SHELL##*/} && return
+}
+
 # Prints only a word to describe the type of the first argument
 # (alias, builtin, function, file)
 typeof() {
 
-# type --help -> ok in Ash
+# type --help -> ok in BusyBox Ash
   type --help >/dev/null 2>&1 || {
     # type -t: err in dash and zsh
     # Bash
