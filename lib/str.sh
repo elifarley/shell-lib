@@ -5,7 +5,7 @@ strsplit() { (( $# == 3 )) || { echo "Usage: $FUNCNAME <str> <separator> <outvar
 # Disable file globbing; coalesce inner whitespace;
 # trim leading and trailing whitespace
 trim() { (set -f; echo $@) ;}
-strcontains() { test -z "${1##*$2*}" ; }; export -f strcontains
+strcontains() { test -z "${1##*$2*}" ; }; shell_name bash && export -f strcontains
 strendswith() { test ! "${1%%*$2}"; }
 strstartswith() { test ! "${1##$2*}"; }
 # See http://mywiki.wooledge.org/BashPitfalls#if_.5B.5B_.24foo_.3D.2BAH4_.27some_RE.27_.5D.5D
