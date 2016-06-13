@@ -1,7 +1,3 @@
-strsplit() { (( $# == 3 )) || { echo "Usage: $FUNCNAME <str> <separator> <outvarname>"; return 1 ;}
-  IFS="$2" read -a "$3" <<< "$1"
-}
-
 # Disable file globbing; coalesce inner whitespace;
 # trim leading and trailing whitespace
 trim() { (set -f; echo $@) ;}
