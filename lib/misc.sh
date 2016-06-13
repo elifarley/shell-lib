@@ -57,25 +57,6 @@ wait_jboss() {
   wait_str "$server_log" "JBoss .* Started in " "$wait_time"
 }
 
-# See http://stackoverflow.com/questions/1494178/how-to-define-hash-tables-in-bash
-ht() { local ht=$(echo "$@" | cksum); echo "${ht//[!0-9]}"; }
-ht_get() {
-  local key="$1"; shift
-  (($#)) || { echo "[ht_get] ERROR: Missing map items" | STDERR && return 1; }
-  (( $# == 1 )) && ! [[ "$1" =~ '=' ]] && echo "$1" && return
-  local _dict k v i; unset _dict
-  for i in "$@"; do
-    [[ "$i" =~ '=' ]] || { echo "[ht_get] ERROR: Missing equals sign: '$i'" | STDERR; return 1; }
-    k=${i%%=*}; v=${i#*=}; _dict[$(ht $k)]="$v"
-  done
-  local result; test "$(shell_name)" = 'bash' && result="${_dict[$(ht $key)]}" || {
-    echo "Shell not supported: $(shell_name)"
-    return 1
-  }
-  [[ -z $result ]] && echo "[ht_get] ERROR: Key not found: '$key'" | STDERR && return 1
-  echo "$result"
-}
-
 pause() { echo 'Press [ENTER] to continue...'; read; }
 ask() { echo -en "$1 "; shift; read "$@"; }
 
@@ -121,36 +102,4 @@ win_sed_inline() {
   rmdir_if_exists *.SED-BKP 1> nul && \
   rmdir_if_exists sed?????? 1> nul
   # See http://stackoverflow.com/questions/1823591/sed-creates-un-deleteable-files-in-windows
-}
-export -f win_sed_inline
-
-# fexec <exported-function-name>[:<extraopts>] <srcdir> [funcopt1 funcopt2 ... --] [findopt1 findopt2 ...]
-# extraopts: d=execdir; m=+; x=maxdepth n
-# example: x1%dm
-fexec() {
-  local fname="$1"; shift
-  local srcdir="$1"; shift
-
-  local funcopts=() findopts=()
-  while test $# -gt 0; do
-    test "$1" = '--' && { shift; funcopts=("${findopts[@]}"); findopts=("$@"); break; }
-    findopts+=("$1") && shift
-  done
-
-  local exectype='-exec' argtype=';' maxdepth=''
-  strcontains "$fname" : && { local extraopts="${fname##*:}" c
-    while test "$extraopts"; do c=${extraopts:0:1}
-      case "$c" in
-        d) exectype='-execdir';;
-        m) argtype='+';;
-        x) maxdepth="${extraopts%%\%*}"
-           extraopts="${extraopts#$maxdepth}"
-           maxdepth="${maxdepth:1}"
-           maxdepth="${maxdepth:-1}"
-           ;;
-      esac
-    extraopts="${extraopts:1}"; done
-  }
-
-  PATH="$LINUX_BIN" find "$srcdir" ${maxdepth:+-maxdepth "$maxdepth"} -type f "${findopts[@]}" $exectype bash -c "${fname%%:*}"' "$@"' fexec-"$fname" "${funcopts[@]}" {} "$argtype"
-}; export -f fexec
+}; shell_name bash && export -f win_sed_inline
