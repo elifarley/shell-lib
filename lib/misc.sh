@@ -81,18 +81,6 @@ create_empty_zip() {
   test -e "$1"
 }
 
-foreachline() {
-  local -r file="$1"; shift
-  local index="$(get_array_index '{}' "$@")"
-  test "$index" || { echo "Missing {}" && return 1; }
-  local opts=("$@")
-
-  while read -r line; do
-    $(strstartswith "$line" '#') && continue
-    opts[$index]="$line"; "${opts[@]}" || return
-  done < "$file"
-}
-
 # This function operates on the current directory only.
 # It is supposed to be called from a find command like this:
 # find path ... -execdir bash -c 'win_sed_inline "$@"' bash "$@" {} +
