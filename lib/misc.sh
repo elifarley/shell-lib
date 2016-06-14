@@ -76,7 +76,7 @@ areYouSure() {
 
 create_empty_zip() {
   echo "Creating empty zip: '$1'"
-  rmdir_if_exists "$1" || return $?
+  rmdir_if_exists "$1" || return
   "$JAVA_HOME"/bin/jar Mcvf "$1" no-file 2> nul
   test -e "$1"
 }
@@ -89,7 +89,7 @@ foreachline() {
 
   while read -r line; do
     $(strstartswith "$line" '#') && continue
-    opts[$index]="$line"; "${opts[@]}" || return $?
+    opts[$index]="$line"; "${opts[@]}" || return
   done < "$file"
 }
 
