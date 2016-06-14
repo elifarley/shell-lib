@@ -1,3 +1,15 @@
+foreachline() {
+  local -r file="$1"; shift
+  local index="$(get_array_index '{}' "$@")"
+  test "$index" || { echo "Missing {}" && return 1; }
+  local opts=("$@")
+
+  while read -r line; do
+    $(strstartswith "$line" '#') && continue
+    opts[$index]="$line"; "${opts[@]}" || return
+  done < "$file"
+}
+
 # fexec <exported-function-name>[:<extraopts>] <srcdir> [funcopt1 funcopt2 ... --] [findopt1 findopt2 ...]
 # extraopts: d=execdir; m=+; x=maxdepth n
 # example: x1%dm
