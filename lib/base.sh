@@ -43,6 +43,7 @@ typeof() {
 }
 
 # Debian GNU/Linux 8 (jessie) [8.5]
+# Ubuntu precise (12.04.5 LTS) [wheezy/sid]
 # Ubuntu 14.04.4 LTS [jessie/sid]
 # Mac OS X [10.6.4]
 os_version() { (
