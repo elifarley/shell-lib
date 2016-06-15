@@ -45,12 +45,18 @@ typeof() {
 # Debian GNU/Linux 8 (jessie) [8.5]
 # Ubuntu precise (12.04.5 LTS) [wheezy/sid]
 # Ubuntu 14.04.4 LTS [jessie/sid]
+# CentOS Linux 7 (Core) [7]
+# Fedora 23 (Twenty Three) [23]
 # Mac OS X [10.6.4]
 os_version() { (
+  test -f /etc/arch-release && echo 'Arch Linux []' && return
   test -f /etc/os-release && . /etc/os-release
   local VERSION="$VERSION_ID"
   test -f /etc/debian_version && VERSION="$(cat /etc/debian_version)"
-  test -z "$VERSION" && which 2>&1 >/dev/null sw_vers && \
+  test -z "$VERSION" && {
+    test -f /etc/redhat-release && cat /etc/redhat-release && return
+    which 2>/dev/null >/dev/null sw_vers && \
     VERSION="$(sw_vers -productVersion)" && PRETTY_NAME="Mac OS X"
+  }
   echo "$PRETTY_NAME [$VERSION]"
 ) }
