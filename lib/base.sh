@@ -50,7 +50,7 @@ os_version() { (
   test -f /etc/os-release && . /etc/os-release
   local VERSION="$VERSION_ID"
   test -f /etc/debian_version && VERSION="$(cat /etc/debian_version)"
-  test -z "$VERSION" && which sw_vers && \
+  test -z "$VERSION" && which 2>&1 >/dev/null sw_vers && \
     VERSION="$(sw_vers -productVersion)" && PRETTY_NAME="Mac OS X"
   echo "$PRETTY_NAME [$VERSION]"
 ) }
