@@ -42,9 +42,14 @@ typeof() {
 
 }
 
+# Debian GNU/Linux 8 (jessie) [8.5]
+# Ubuntu 14.04.4 LTS [jessie/sid]
+# Mac OS X [10.6.4]
 os_version() { (
   test -f /etc/os-release && . /etc/os-release
   local VERSION="$VERSION_ID"
   test -f /etc/debian_version && VERSION="$(cat /etc/debian_version)"
+  test -z "$VERSION" && which sw_vers && \
+    VERSION="$(sw_vers -productVersion)" && PRETTY_NAME="Mac OS X"
   echo "$PRETTY_NAME [$VERSION]"
 ) }
