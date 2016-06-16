@@ -48,7 +48,7 @@ typeof() {
 # CentOS Linux 7 (Core) [7]
 # Fedora 23 (Twenty Three) [23]
 # Mac OS X [10.6.4]
-os_version() { (
+_os_version() { (
   test -f /etc/arch-release && echo 'Arch Linux []' && return
   test -f /etc/os-release && . /etc/os-release
   local VERSION="$VERSION_ID"
@@ -58,5 +58,12 @@ os_version() { (
     which 2>/dev/null >/dev/null sw_vers && \
     VERSION="$(sw_vers -productVersion)" && PRETTY_NAME="Mac OS X"
   }
-  echo "$PRETTY_NAME [$VERSION]"
+  test "$PRETTY_NAME" -o "$VERSION" && echo "$PRETTY_NAME [$VERSION]"
 ) }
+
+os_version() {
+  local result; result="$(_os_version)" || return
+  test "$1" || { echo $result; return ;}
+  local asterisk="$(echo "$1" | tr -cd '*')"; test "$asterisk" && asterisk="$1" || asterisk="$1*"
+  case "$(echo "$result" | tr '[:upper:]' '[:lower:]')" in $asterisk) return;; esac; return 1
+}
