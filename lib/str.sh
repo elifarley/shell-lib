@@ -4,8 +4,12 @@ trim() { (set -f; echo $@) ;}
 strcontains() { test -z "${1##*$2*}" ; }; shell_name bash && export -f strcontains
 strendswith() { test ! "${1%%*$2}"; }
 strstartswith() { test ! "${1##$2*}"; }
-# See http://mywiki.wooledge.org/BashPitfalls#if_.5B.5B_.24foo_.3D.2BAH4_.27some_RE.27_.5D.5D
-contains_asterisk() { local ASTERISK='\*'; [[ $1 =~ $ASTERISK ]] ;}
+charcount() {
+  local char="$1"; shift;
+  result="$(echo "$*" | tr -cd "$char")"; result=${#result};
+  test $result -gt 0 && echo $result
+}
+charexists() { charcount "$@" >/dev/null ;}
 
 escape_quotes() {
   result=''
