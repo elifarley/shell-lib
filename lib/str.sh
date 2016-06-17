@@ -9,7 +9,10 @@ charcount() {
   result="$(echo "$*" | tr -cd "$char")"; result=${#result};
   test $result -gt 0 && echo $result
 }
-charexists() { charcount "$@" >/dev/null ;}
+charexists() {
+  local char="$1"; shift
+  case "$*" in *"$char"*) return;; esac; return 1
+}
 
 escape_quotes() {
   result=''
