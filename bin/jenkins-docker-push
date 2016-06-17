@@ -19,15 +19,15 @@ docker_build_archive() {
 }
 
 jenkins_docker_push() {
-  test $# -eq 4 || {
-    printf 'Parameters:\n\nREPO_PREFIX\nUPSTREAM_JOB_NAME\nUPSTREAM_BUILD_NUMBER\nCHANGESET'
+  test $# -ge 2 || {
+    printf 'Parameters:\n\nREPO_PREFIX\nUPSTREAM_JOB_NAME\n<UPSTREAM_BUILD_NUMBER>\n<CHANGESET>'
     return 1
   }
 
   local REPO_PREFIX="$1"; shift
   local UPSTREAM_JOB_NAME="$1"; shift
-  local UPSTREAM_BUILD_NUMBER="$1"; shift
-  local CHANGESET="$1"
+  local UPSTREAM_BUILD_NUMBER="${1:-$(id -nu)}"; shift
+  local CHANGESET="${1:-$(git rev-parse HEAD)}"
 
   REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME."
   local REPO_PREFIX_BN="${REPO_PREFIX}$UPSTREAM_BUILD_NUMBER"
