@@ -6,7 +6,7 @@ generate_dockerfiles() {
   local dockerfile_dir="$(readlink -f "${1:-.}")"; shift
   local ptype="$1"; shift
 
-  cat >"$dockerfile_dir"/.dockerignore <<EOF
+  cat >"$dockerfile_dir"/.dockerignore <<-'EOF'
 **~
 **.DS_Store
 **.log
