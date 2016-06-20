@@ -30,6 +30,7 @@ archive_artifacts() {
     --exclude-vcs --exclude-backups --exclude-caches \
     -C "$project_root" $extra_tar_items "$@" && \
   mv "$adir"/app.tgz "$archive_target" && \
+  du -hs "$archive_target"/app.tgz && \
   rm -rf "$adir" || \
   { rm -rf "$adir"; return 1 ;}
 
