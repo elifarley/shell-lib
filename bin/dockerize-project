@@ -26,7 +26,7 @@ EOF
       image_parent='elifarley/docker-rails:rails-4.2.5.1'
       ;;
     jvm)
-      image_parent='elifarley/docker-dev-env:debian-openjdk-8-onbuild'
+      image_parent='elifarley/docker-dev-env:debian-jdk-8-onbuild'
       ;;
     nodejs)
       image_parent='elifarley/docker-dev-env:debian-node-onbuild'
