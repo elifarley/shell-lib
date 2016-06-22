@@ -8,11 +8,15 @@ docker_build() {
 docker_build_archive() {
   local tag="$1"; shift
   local context_root="${1:-.}"; test $# -eq 0 || shift
-  local context_archive="$context_root"/app.tgz
+  local context_archive="$context_root"/target/app.tgz
+  test -s "$context_archive" || context_archive="$context_root"/app.tgz
 
+  printf 'Building Docker image "%s"\nfrom context ' "$REPO_PREFIX_CS"
   if test -s "$context_archive"; then
+    printf "archive at '%s'...\n\n" "$(readlink -f "$context_archive")"
     cat "$context_archive" | docker_build "$tag" "$@" - || return
   else
+    printf "dir at '%s'...\n\n" "$(readlink -f "$context_root")"
     docker_build "$tag" "$@" "$context_root" || return
   fi
 
@@ -33,10 +37,9 @@ jenkins_docker_push() {
   local REPO_PREFIX_BN="${REPO_PREFIX}$UPSTREAM_BUILD_NUMBER"
   local REPO_PREFIX_CS="$REPO_PREFIX_BN-$(printf '%.7s' "$CHANGESET")"
 
-  echo "Building '$REPO_PREFIX_CS'..."
-  docker_build_archive "$REPO_PREFIX_BN" || return
-  docker tag "$REPO_PREFIX_BN" "$REPO_PREFIX_CS" || return
-  docker tag "$REPO_PREFIX_BN" "${REPO_PREFIX}latest" || return
+  docker_build_archive "$REPO_PREFIX_CS" || return
+  docker tag "$REPO_PREFIX_CS" "$REPO_PREFIX_BN" || return
+  docker tag "$REPO_PREFIX_CS" "${REPO_PREFIX}latest" || return
 
   echo "Pushing 3 tags..."
   docker push "${REPO_PREFIX}latest" || return
