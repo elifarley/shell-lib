@@ -55,7 +55,9 @@ generate_dockerfile_and_archive() {
       dockerfile_dir="$project_root"/target
       local jars=("$project_root"/target/*.jar)
       test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$project_root"/target/}") || {
-        mv "$project_root"/target/*.jar "$project_root"/target/app.jar || return
+        test -f "$project_root"/target/app.jar || {
+          mv "$project_root"/target/*.jar "$project_root"/target/app.jar || return
+        }
         tar_params+=(app.jar)
       }
       ;;
