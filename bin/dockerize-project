@@ -23,14 +23,13 @@ EOF
 
   case "$ptype" in
     ruby)
-      image_parent='elifarley/docker-rails:rails-4.2.5.1'
-      ;;
-    jvm)
-      image_parent='elifarley/docker-dev-env:debian-jdk-8-onbuild'
-      ;;
+      image_parent='elifarley/docker-rails:rails-4.2.5.1' ;;
     nodejs)
-      image_parent='elifarley/docker-dev-env:debian-node-onbuild'
-      ;;
+      image_parent='elifarley/docker-dev-env:debian-node-onbuild' ;;
+    python)
+      image_parent='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
+    jvm)
+      image_parent='elifarley/docker-dev-env:debian-jdk-8-onbuild' ;;
     *)
       return 1
   esac
@@ -48,7 +47,7 @@ generate_dockerfile_and_archive() {
   local tar_params=()
   local all_included=''
   case "$ptype" in
-    ruby|nodejs)
+    ruby|nodejs|python)
       tar_params+=(.); all_included=T
       ;;
     jvm)
