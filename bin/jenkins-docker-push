@@ -30,7 +30,7 @@ jenkins_docker_push() {
 
   local REPO_PREFIX="$1"; shift
   local UPSTREAM_JOB_NAME="$1"; test $# -gt 0 && shift
-  local UPSTREAM_BUILD_NUMBER="${1:-$(id -nu)}"; test $# -gt 0 && shift
+  local UPSTREAM_BUILD_NUMBER="${1:-$(id -nu)@$(hostname -s)}"; test $# -gt 0 && shift
   local CHANGESET="${1:-$(git rev-parse HEAD)}"
 
   REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME."
