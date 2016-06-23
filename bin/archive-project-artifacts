@@ -2,12 +2,14 @@
 
 build_info() {
   printf 'BUILD_DATE="%s %s"\n' "$(date +'%F %T.%N')" "$(date +%Z)"
-  printf "BUILD_MONIKER='%s-%.7s'\n" "$JOB_NAME" "$GIT_COMMIT"
-  echo "BUILD_URL='$BUILD_URL'"
-  echo "DVCS_URL='$GIT_URL'"
-  echo "DVCS_NODE='$GIT_COMMIT'"
-  echo "DVCS_BRANCH='$GIT_BRANCH'"
-  test "$PROJECT_TYPE" && echo "PROJECT_TYPE='$PROJECT_TYPE'"
+  printf "BUILD_MONIKER='%s-%.7s'\n" "${JOB_NAME:-$(id -nu)@$(hostname -s)}" "${GIT_COMMIT:-$(git 2>/dev/null rev-parse HEAD)}"
+  sed /^$/d <<-EOF
+${BUILD_URL:+BUILD_URL='$BUILD_URL'}
+${GIT_URL:+DVCS_URL='$GIT_URL'}
+DVCS_NODE='${GIT_COMMIT:-$(git 2>/dev/null rev-parse HEAD)}'
+${GIT_BRANCH:+DVCS_BRANCH='$GIT_BRANCH'}
+${PROJECT_TYPE:+PROJECT_TYPE='$PROJECT_TYPE'}
+EOF
 }
 
 archive_artifacts() {
