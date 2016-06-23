@@ -34,8 +34,13 @@ EOF
       return 1
   esac
 
-  printf "FROM %s\nMAINTAINER github.com/elifarley/shell-lib\n#\n" "$image_parent" > \
-    "$dockerfile_dir"/Dockerfile
+  cat > "$dockerfile_dir"/Dockerfile <<-EOF
+FROM $image_parent
+MAINTAINER http://github.com/elifarley/shell-lib
+ENV BASE_IMAGE='$image_parent'
+#
+
+EOF
 }
 
 generate_dockerfile_and_archive() {
