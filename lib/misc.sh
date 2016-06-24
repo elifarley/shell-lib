@@ -1,13 +1,16 @@
-urlencode() {
-  local LANG=C; local c
-  for i in $(seq 1 ${#1}); do
-    c="$(expr substr "$1" $i 1)"
-    case $c in
-      [a-zA-Z0-9.~_-]) printf "$c" ;;
-      *) printf '%%%02X' "'$c" ;; 
-    esac
-  done; echo
-}
+urlencodepipe() {
+  local LANG=C; local c; while IFS= read -r c; do
+    case $c in [a-zA-Z0-9.~_-]) printf "$c"; continue ;; esac
+    printf "$c" | od -An -tx1 | tr ' ' % | xargs printf "%s"
+  done <<EOF
+$(fold -w1)
+EOF
+  echo
+} #tr -d '\n'
+
+urlencodeallpipe() { od -An -tx1 | tr ' ' % ;} # FIXME always appends %0a
+
+urlencode() { printf $* | urlencodepipe ;}
 
 hex2decimal() { printf '%u' "0x$1"; echo ;}
 
