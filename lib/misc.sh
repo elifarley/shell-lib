@@ -10,7 +10,7 @@ EOF
 
 urlencodeallpipe() { od -An -tx1 | tr ' ' % ;} # FIXME always appends %0a
 
-urlencode() { printf $* | urlencodepipe ;}
+urlencode() { printf "$*" | urlencodepipe ;}
 
 hex2decimal() { printf '%u' "0x$1"; echo ;}
 
