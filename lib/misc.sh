@@ -1,12 +1,12 @@
 urlencode() {
-    local LANG=C
-    for i in $(seq 1 ${#1}); do
-        local c="$(expr substr "$1" $i 1)"
-        case $c in
-            [a-zA-Z0-9.~_-]) printf "$c" ;;
-            *) printf '%%%02X' "'$c" ;; 
-        esac
-    done; echo
+  local LANG=C; local c
+  for i in $(seq 1 ${#1}); do
+    c="$(expr substr "$1" $i 1)"
+    case $c in
+      [a-zA-Z0-9.~_-]) printf "$c" ;;
+      *) printf '%%%02X' "'$c" ;; 
+    esac
+  done; echo
 }
 
 hex2decimal() { printf '%u' "0x$1"; echo ;}
