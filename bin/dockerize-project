@@ -52,9 +52,6 @@ generate_dockerfile_and_archive() {
   local tar_params=()
   local all_included=''
   case "$ptype" in
-    ruby|nodejs|python)
-      tar_params+=(.); all_included=T
-      ;;
     jvm)
       dockerfile_dir="$project_root"/target
       local jars=("$project_root"/target/*.jar)
@@ -65,6 +62,7 @@ generate_dockerfile_and_archive() {
         tar_params+=(app.jar)
       }
       ;;
+    *) tar_params+=(.); all_included=T ;;
   esac
 
   local extra_files='Dockerfile .dockerignore'
