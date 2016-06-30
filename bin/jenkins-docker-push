@@ -14,7 +14,7 @@ docker_build_archive() {
   printf 'Building Docker image "%s"\nfrom context ' "$REPO_PREFIX_CS"
   if test -s "$context_archive"; then
     printf "archive at '%s'...\n\n" "$(readlink -f "$context_archive")"
-    cat "$context_archive" | docker_build "$tag" "$@" - || return
+    docker_build "$tag" "$@" - <"$context_archive" || return
   else
     printf "dir at '%s'...\n\n" "$(readlink -f "$context_root")"
     docker_build "$tag" "$@" "$context_root" || return
