@@ -28,13 +28,13 @@ jenkins_docker_push() {
     return 1
   }
 
-  local REPO_PREFIX="$1"; shift
+  local REPO_PREFIX="$(echo $1 | tr '[:upper:]' '[:lower:]')"; shift
   local UPSTREAM_JOB_NAME="$1"; test $# -gt 0 && shift
-  local UPSTREAM_BUILD_NUMBER="${1:-$(id -nu)@$(hostname -s)}"; test $# -gt 0 && shift
+  local UPSTREAM_BUILD_NUMBER="${1:-$(id -nu)-at-$(hostname -s)}"; test $# -gt 0 && shift
   local CHANGESET="${1:-$(git rev-parse HEAD)}"
 
-  REPO_PREFIX="$REPO_PREFIX:$UPSTREAM_JOB_NAME."
-  local REPO_PREFIX_BN="${REPO_PREFIX}$UPSTREAM_BUILD_NUMBER"
+  REPO_PREFIX="$(echo $REPO_PREFIX:$UPSTREAM_JOB_NAME | tr '[:upper:]' '[:lower:]')."
+  local REPO_PREFIX_BN="$(echo ${REPO_PREFIX}$UPSTREAM_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
   local REPO_PREFIX_CS="$REPO_PREFIX_BN-$(printf '%.7s' "$CHANGESET")"
 
   docker_build_archive "$REPO_PREFIX_CS" || return
