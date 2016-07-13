@@ -28,9 +28,9 @@ hex2bytes () {
 }
 pipehex2bytes () { while read -r b file; do hex2bytes $b; done ;}
 
-int2b64() { hex2bytes $(printf '%x\n' $1) | base64 -w0 ;}
+int2b64() { hex2bytes $(printf '%x\n' $1) | base64 | tr -d '\n' ;}
 
-hex2b64_padded() { pipehex2bytes | base64 -w0 | tr '+/' '-_' ;}
+hex2b64_padded() { pipehex2bytes | base64 | tr -d '\n' | tr '+/' '-_' ;}
 hex2b64() { local r=$(hex2b64_padded); echo ${r%%=*} ;}
 
 # TimeStamp in Decimal
@@ -41,7 +41,7 @@ millistamp_hex() { printf '%x\n' $(millistamp) ;}
 millistamp_b64() { millistamp_hex | hex2b64 ;}
 
 # See https://gist.github.com/earthgecko/3089509
-mkrandom() { base64 -w0 /dev/urandom | tr -d "/+${2:-0Oo}" | dd bs="${1:-8}" count=1 2>/dev/null | xargs ;}
+mkrandom() { base64 /dev/urandom | tr -d "\n/+${2:-0Oo}" | dd bs="${1:-8}" count=1 2>/dev/null | xargs ;}
 mkrandomL() { mkrandom "$@" | tr '[[:upper:]]' '[[:lower:]]' ;}
 mkrandomU() { mkrandom "$@" | tr '[[:lower:]]' '[[:upper:]]' ;}
 
