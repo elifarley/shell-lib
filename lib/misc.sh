@@ -105,3 +105,5 @@ win_sed_inline() {
   rmdir_if_exists sed?????? 1> nul
   # See http://stackoverflow.com/questions/1823591/sed-creates-un-deleteable-files-in-windows
 }; shell_name bash && export -f win_sed_inline
+
+: # make sure this script's exit code is 0 regardless of the exit code above
