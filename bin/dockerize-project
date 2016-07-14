@@ -63,9 +63,9 @@ generate_dockerfile_and_archive() {
       tar_params+=(.); all_included=T
       local app_exec
       dockerfile_dir="$project_root"/target
-      tar --strip-components=1 -xf "$gradle_dist" -C "$dockerfile_dir" || return
+      tar --strip-components=1 -xf "$gradle_dist" -C "$dockerfile_dir" && \
       app_exec="$(cd "$dockerfile_dir"/bin && find . ! -name '*.*')" && app_exec="${app_exec#./}" && \
-      ln -s bin/"$app_exec" "$project_root"/target/app.sh
+      ln -s bin/"$app_exec" "$project_root"/target/app.sh || return
       ;;
     jvm)
       dockerfile_dir="$project_root"/target
