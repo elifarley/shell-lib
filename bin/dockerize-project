@@ -29,7 +29,7 @@ EOF
     python)
       image_parent='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
     jvm*)
-      image_parent='elifarley/docker-dev-env:alpine-jdk-8-onbuild' ;;
+      image_parent='elifarley/docker-cep:alpine-jdk-8' ;;
     *)
       return 1
   esac
@@ -38,6 +38,8 @@ EOF
 FROM $image_parent
 MAINTAINER http://github.com/elifarley/shell-lib
 ENV BASE_IMAGE='$image_parent'
+
+EXPOSE 8080
 #
 
 EOF
