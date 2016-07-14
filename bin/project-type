@@ -23,9 +23,9 @@ get_rails_version() {
 }
 
 detect_project_jvm() {
-  dir_not_empty "${1:-.}"/target/*.?ar || \
   test -f "${1:-.}"/pom.xml || \
-  test -f "${1:-.}"/build.gradle
+  test -f "${1:-.}"/build.gradle || \
+  dir_not_empty "${1:-.}"/target/*.?ar
 }
 
 detect_project_nodejs() {
