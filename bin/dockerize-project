@@ -28,7 +28,7 @@ EOF
       image_parent='elifarley/docker-dev-env:debian-node-onbuild' ;;
     python)
       image_parent='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
-    jvm)
+    jvm*)
       image_parent='elifarley/docker-dev-env:alpine-jdk-8-onbuild' ;;
     *)
       return 1
