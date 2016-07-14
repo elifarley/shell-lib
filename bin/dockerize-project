@@ -52,8 +52,9 @@ generate_dockerfile_and_archive() {
   local tar_params=()
   local all_included=''
   test "$ptype" = jvm && {
-    local gradle_dist="$project_root"/build/distributions/*.tar
-    test -s "$gradle_dist" && ptype=jvm-gradle
+    local gradle_dist
+    gradle_dist="$(find "$project_root"/build/distributions -name '*.tar')" && \
+      ptype=jvm-gradle
   }
   case "$ptype" in
     jvm-gradle)
