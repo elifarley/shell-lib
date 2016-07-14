@@ -29,7 +29,7 @@ EOF
     python)
       image_parent='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
     jvm*)
-      image_parent='elifarley/docker-cep:alpine-jdk-8' ;;
+      image_parent='elifarley/docker-cep:alpine-jdk-8-copycontext' ;;
     *)
       return 1
   esac
