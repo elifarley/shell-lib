@@ -20,17 +20,17 @@ jvm_loader() {
   }
 
   # Gradle
-  count="$(find "$project_root"/bin -mindepth 1 ! type d ! -name '*.*' | wc -l)"
+  count="$(find "$project_root"/bin -mindepth 1 ! -type d ! -name '*.*' | wc -l)"
   test $count -eq 1 && {
     local app_exec
-    app_exec="$(find "$project_root"/bin -mindepth 1 ! type d ! -name '*.*')" && \
+    app_exec="$(find "$project_root"/bin -mindepth 1 ! -type d ! -name '*.*')" && \
     { test -x "$app_exec" || chmod u+x "$app_exec" ;} && \
     exec "$app_exec" "$@" || return
   }
 
   test $count -gt 1 && {
     echo "More than 1 executable found at '$project_root/bin':"
-    find "$project_root"/bin -mindepth 1 ! type d ! -name '*.*' -exec ls -lhFa {} +
+    find "$project_root"/bin -mindepth 1 ! -type d ! -name '*.*' -exec ls -lhFa {} +
     return 1
   }
 
