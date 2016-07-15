@@ -76,7 +76,7 @@ generate_dockerfile_and_archive() {
         test -f "$project_root"/target/app.jar || {
           mv "$project_root"/target/*.jar "$project_root"/target/app.jar || return
         }
-        tar_params+=(app.jar)
+        tar_params+=(app.jar *app*.sh)
       }
       ;;
     *) tar_params+=(.); all_included=T ;;
