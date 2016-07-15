@@ -43,4 +43,5 @@ jvm_loader() {
   return 1
 }
 
+test "$DEBUG" && set -x
 jvm_loader "$@"
