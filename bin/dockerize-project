@@ -71,12 +71,14 @@ generate_dockerfile_and_archive() {
       }
       ;;
     jvm)
-      local jars=("$project_root"/target/*.jar)
-      test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$project_root"/target/}") || {
-        test -f "$project_root"/target/app.jar || {
-          mv "$project_root"/target/*.jar "$project_root"/target/app.jar || return
+      local appfiles=("$dockerfile_dir"/*app*.sh)
+      tar_params+=("${appfiles[@]#"$dockerfile_dir"/}")
+      local jars=("$dockerfile_dir"/*.jar)
+      test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$dockerfile_dir"/}") || {
+        test -f "$dockerfile_dir"/app.jar || {
+          mv "$dockerfile_dir"/*.jar "$dockerfile_dir"/app.jar || return
         }
-        tar_params+=(app.jar *app*.sh)
+        tar_params+=(app.jar)
       }
       ;;
     *) tar_params+=(.); all_included=T ;;
