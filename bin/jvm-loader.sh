@@ -4,17 +4,22 @@
 jvm_loader() {
   local project_root="${1:-$PWD}"
   local count
+  local app_exec
+
+  echo "[jvm_loader] App root: '$project_root'"
 
   # Single jar
   count="$(find "$project_root" -name '*app.jar' | wc -l)"
   test $count -eq 1 && {
+    app_exec="$project_root"/*app.jar
+    echo "[jvm_loader] Loading single jar: '$app_exec'..."
     exec java \
     -Djava.security.egd=file:/dev/./urandom \
-    -jar "$project_root"/*app.jar "$@" || return
+    -jar "$app_exec" "$@" || return
   }
 
   test $count -gt 1 && {
-    echo "More than 1 jar found at '$project_root':"
+    echo "[jvm_loader] More than 1 jar found at '$project_root':"
     ls -lhFa "$project_root"/*app.jar
     return 1
   }
@@ -22,14 +27,14 @@ jvm_loader() {
   # Gradle
   count="$(find "$project_root"/bin -mindepth 1 ! -type d ! -name '*.*' | wc -l)"
   test $count -eq 1 && {
-    local app_exec
     app_exec="$(find "$project_root"/bin -mindepth 1 ! -type d ! -name '*.*')" && \
+    echo "[jvm_loader] Loading Gradle-based app: '$app_exec'..." && \
     { test -x "$app_exec" || chmod u+x "$app_exec" ;} && \
     exec "$app_exec" "$@" || return
   }
 
   test $count -gt 1 && {
-    echo "More than 1 executable found at '$project_root/bin':"
+    echo "[jvm_loader] More than 1 executable found at '$project_root/bin':"
     find "$project_root"/bin -mindepth 1 ! -type d ! -name '*.*' -exec ls -lhFa {} +
     return 1
   }
