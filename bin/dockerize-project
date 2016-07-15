@@ -64,9 +64,9 @@ generate_dockerfile_and_archive() {
       tar_params+=(.); all_included=T
       local app_exec
       tar --strip-components=1 -xf "$gradle_dist" -C "$dockerfile_dir" || return
-      app_exec="$(find "$dockerfile_dir"/bin ! -name '*.*')" && test -x "$app_exec" || {
+      app_exec="$(find "$dockerfile_dir"/bin -mindepth 1 ! -type d ! -name '*.*')" && test -x "$app_exec" || {
         echo "Unable to find Gradle-generated executable at '"$dockerfile_dir"/bin':"
-        find "$dockerfile_dir"/bin ! -name '*.*' -exec ls -lhFart {} +
+        find "$dockerfile_dir"/bin -mindepth 1 ! -type d ! -name '*.*' -exec ls -lhFa {} +
         return 1
       }
       ;;
