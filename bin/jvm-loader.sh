@@ -11,7 +11,7 @@ jvm_loader() {
   # Single jar
   count="$(find "$project_root" -name '*app.jar' | wc -l)"
   test $count -eq 1 && {
-    app_exec="$project_root"/*app.jar
+    app_exec="$(find "$project_root" -name '*app.jar')"
     echo "[jvm_loader] Loading single jar: '$app_exec'..."
     exec java \
     -Djava.security.egd=file:/dev/./urandom \
