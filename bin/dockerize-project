@@ -71,8 +71,6 @@ generate_dockerfile_and_archive() {
       }
       ;;
     jvm)
-      local appfiles=("$dockerfile_dir"/*app*.sh)
-      tar_params+=("${appfiles[@]#"$dockerfile_dir"/}")
       local jars=("$dockerfile_dir"/*.jar)
       test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$dockerfile_dir"/}") || {
         test -f "$dockerfile_dir"/app.jar || {
@@ -89,6 +87,11 @@ generate_dockerfile_and_archive() {
       cp -v "$CMD_BASE"/jvm-loader.sh "$dockerfile_dir"/app.sh || return
     } ;;
   esac
+
+  test ! "$all_included" && \
+    local appfiles=("$dockerfile_dir"/*app*.sh) && \
+    test ${#appfiles[@]} -gt 1 -o -e "$appfiles" && \
+      tar_params+=("${appfiles[@]#"$dockerfile_dir"/}")
 
   local extra_files='Dockerfile .dockerignore'
   test "$project_root" != "$dockerfile_dir" && \
