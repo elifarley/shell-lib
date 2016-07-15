@@ -54,21 +54,23 @@ generate_dockerfile_and_archive() {
   local tar_params=()
   local all_included=''
   test "$ptype" = jvm && {
+    dockerfile_dir="$project_root"/target
     local gradle_dist
     gradle_dist="$(find "$project_root"/build/distributions -name '*.tar')" && \
-      ptype=jvm-gradle
+      ptype=jvm:gradle
   }
   case "$ptype" in
-    jvm-gradle)
+    jvm:gradle)
       tar_params+=(.); all_included=T
       local app_exec
-      dockerfile_dir="$project_root"/target
-      tar --strip-components=1 -xf "$gradle_dist" -C "$dockerfile_dir" && \
-      app_exec="$(cd "$dockerfile_dir"/bin && find . ! -name '*.*')" && app_exec="${app_exec#./}" && \
-      ln -s bin/"$app_exec" "$project_root"/target/app.sh || return
+      tar --strip-components=1 -xf "$gradle_dist" -C "$dockerfile_dir" || return
+      app_exec="$(find "$dockerfile_dir"/bin ! -name '*.*')" && test -x "$app_exec" || {
+        echo "Unable to find Gradle-generated executable at '"$dockerfile_dir"/bin':"
+        find "$dockerfile_dir"/bin ! -name '*.*' -exec ls -lhFart {} +
+        return 1
+      }
       ;;
     jvm)
-      dockerfile_dir="$project_root"/target
       local jars=("$project_root"/target/*.jar)
       test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$project_root"/target/}") || {
         test -f "$project_root"/target/app.jar || {
@@ -78,6 +80,12 @@ generate_dockerfile_and_archive() {
       }
       ;;
     *) tar_params+=(.); all_included=T ;;
+  esac
+
+  case "$ptype" in
+    jvm*) test -e "$dockerfile_dir"/app.sh && echo "'app.sh' already exists" || {
+      cp -v "$CMD_BASE"/jvm-loader.sh "$dockerfile_dir"/app.sh || return
+    } ;;
   esac
 
   local extra_files='Dockerfile .dockerignore'
