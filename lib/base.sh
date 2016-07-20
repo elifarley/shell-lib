@@ -2,6 +2,8 @@ STDERR() { cat - 1>&2; }
 
 exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
 
+foreach() { local cmd="$1"; shift; for i; do $cmd "$i"; done ;}
+
 # Example:
 # myfunc() { for i; do echo $i; done ;}
 # argsep , myfunc "1: a b,2: c" "3: d e,4:f"
