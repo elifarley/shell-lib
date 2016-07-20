@@ -2,6 +2,15 @@ STDERR() { cat - 1>&2; }
 
 exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
 
+# Example:
+# myfunc() { for i; do echo $i; done ;}
+# argsep , myfunc "1: a b,2: c" "3: d e,4:f"
+argsep() {
+  local _IFS="$1"; shift; local cmd="$1"; shift
+  _IFS="$_IFS" set -- $@
+  $cmd "$@"
+}
+
 get_array_index() {
   local -r key="$1"; shift
   local -i index=0
