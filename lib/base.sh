@@ -7,7 +7,7 @@ exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
 # argsep , myfunc "1: a b,2: c" "3: d e,4:f"
 argsep() {
   local _IFS="$1"; shift; local cmd="$1"; shift
-  _IFS="$_IFS" set -- $@
+  IFS="$_IFS" set -- $@
   $cmd "$@"
 }
 
