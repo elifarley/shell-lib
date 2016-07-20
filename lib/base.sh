@@ -5,13 +5,9 @@ exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
 foreach() { local cmd="$1"; shift; for i; do $cmd "$i"; done ;}
 
 # Example:
-# myfunc() { for i; do echo $i; done ;}
+# myfunc() { echo START; for i; do echo $i; done ;}
 # argsep , myfunc "1: a b,2: c" "3: d e,4:f"
-argsep() {
-  local _IFS="$1"; shift; local cmd="$1"; shift
-  IFS="$_IFS" set -- $@
-  $cmd "$@"
-}
+argsep() { local IFS="$1"; shift; local cmd="$1"; shift; set -- $@; $cmd "$@" ;}
 
 get_array_index() {
   local -r key="$1"; shift
