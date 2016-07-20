@@ -3,8 +3,9 @@ CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
 PATH="$CMD_BASE:$PATH"
 
 generate_dockerfiles() {
-  local dockerfile_dir="$(readlink -f "${1:-.}")"; shift
-  local ptype="$1"; shift
+  local dockerfile_dir="$(readlink -f "${1:-.}")"
+  local ptype="$2"
+  local base_image="$BASE_IMAGE"
 
   cat >"$dockerfile_dir"/.dockerignore <<-'EOF'
 **~
@@ -19,25 +20,25 @@ test
 .rubocop*
 EOF
 
-  test -f "$dockerfile_dir"/Dockerfile && return
+  test ! "$base_image" && test -f "$dockerfile_dir"/Dockerfile && return
 
-  case "$ptype" in
+  test ! "$base_image" && case "$ptype" in
     ruby)
-      image_parent='elifarley/docker-rails:rails-4.2.5.1' ;;
+      base_image='elifarley/docker-rails:rails-4.2.5.1' ;;
     nodejs)
-      image_parent='elifarley/docker-dev-env:debian-node-onbuild' ;;
+      base_image='elifarley/docker-dev-env:debian-node-onbuild' ;;
     python)
-      image_parent='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
+      base_image='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
     jvm*)
-      image_parent='elifarley/docker-cep:alpine-jdk-8-copycontext' ;;
+      base_image='elifarley/docker-cep:alpine-jdk-8-copycontext' ;;
     *)
       return 1
   esac
 
   cat > "$dockerfile_dir"/Dockerfile <<-EOF
-FROM $image_parent
-MAINTAINER http://github.com/elifarley/shell-lib
-ENV BASE_IMAGE='$image_parent'
+FROM $base_image
+MAINTAINER https://github.com/elifarley/shell-lib/blob/master/bin/dockerize-project
+ENV BASE_IMAGE='$base_image'
 
 EXPOSE 8080
 #
