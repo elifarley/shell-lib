@@ -10,6 +10,7 @@ generate_dockerfiles() {
   cat >"$dockerfile_dir"/.dockerignore <<-'EOF'
 **~
 **.DS_Store
+**nohup.out
 **.log
 .idea
 target
