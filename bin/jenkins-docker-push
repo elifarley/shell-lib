@@ -9,15 +9,22 @@ docker_build_archive() {
   local tag="$1"; shift
   local context_root="${1:-.}"; test $# -eq 0 || shift
   local context_archive="$context_root"/target/app.tgz
+  local pushinfopath='docker-push.info'
   test -s "$context_archive" || context_archive="$context_root"/app.tgz
 
   printf 'Building Docker image "%s"\nfrom context ' "$REPO_PREFIX_CS"
   if test -s "$context_archive"; then
     printf "archive at '%s'...\n\n" "$(readlink -f "$context_archive")"
     docker_build "$tag" "$@" - <"$context_archive" || return
+    pushinfopath="$(dirname "$context_archive")/$pushinfopath"
+    printf "CONTEXT_ROOT=$context_archive\nIMAGE=$tag\n" \
+      > "$pushinfopath" || return
   else
     printf "dir at '%s'...\n\n" "$(readlink -f "$context_root")"
     docker_build "$tag" "$@" "$context_root" || return
+    pushinfopath="$context_root/$pushinfopath"
+    printf "CONTEXT_ROOT=$context_root\nIMAGE=$tag\n" \
+      > "$pushinfopath" || return
   fi
 
 }
