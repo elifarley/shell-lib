@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
+CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
+
+for lib in container-img-naming
+do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 build_info() {
+  local CHANGESET="$(changeset)"
+  set_img_vars "$IMG_REPO" "$JOB_NAME" "$BUILD_NUMBER" "$CHANGESET"
+
   printf 'BUILD_DATE="%s %s"\n' "$(date +'%F %T.%N')" "$(date +%Z)"
-  printf "BUILD_MONIKER='%s-%.7s'\n" "${JOB_NAME:-$(id -nu)@$(hostname -s)}" "${GIT_COMMIT:-$(git 2>/dev/null rev-parse HEAD)}"
+  printf "IMAGE_NAME='%s'\n" "$IMG_PREFIX_CS"
+  printf "BUILD_MONIKER='%s-%.7s'\n" "${JOB_NAME:-$(id -nu)@$(hostname -s)}" "$CHANGESET"
   sed /^$/d <<-EOF
 ${BUILD_URL:+BUILD_URL='$BUILD_URL'}
 ${GIT_URL:+DVCS_URL='$GIT_URL'}
-DVCS_NODE='${GIT_COMMIT:-$(git 2>/dev/null rev-parse HEAD)}'
+DVCS_NODE='$CHANGESET'
 ${GIT_BRANCH:+DVCS_BRANCH='$GIT_BRANCH'}
 ${PROJECT_TYPE:+PROJECT_TYPE='$PROJECT_TYPE'}
 EOF
