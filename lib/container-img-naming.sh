@@ -11,6 +11,11 @@ changeset_short() {
 }
 
 set_img_vars() {
+  local IMG_REPO="$(echo $1 | tr '[:upper:]' '[:lower:]')"; shift
+  local IMG_JOB_NAME="$1"; test $# -gt 0 && shift
+  local IMG_BUILD_NUMBER="${1:-$(userAtHost)}"; test $# -gt 0 && shift
+  local CHANGESET="${1:-$(chageset)}"
+  
   IMG_PREFIX_BASE="$(echo $IMG_REPO:$IMG_JOB_NAME | tr '[:upper:]' '[:lower:]')."
   IMG_PREFIX_BN="$(echo ${IMG_PREFIX_BASE}$IMG_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
   IMG_PREFIX_CS="$REPO_PREFIX_BN-$(changeset_short "$CHANGESET")"
