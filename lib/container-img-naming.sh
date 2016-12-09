@@ -3,7 +3,7 @@ userAtHost() {
 }
 
 chageset() {
-  git rev-parse HEAD
+  git 2>/dev/null rev-parse HEAD
 }
 
 changeset_short() {
