@@ -23,5 +23,5 @@ set_img_vars() {
   
   IMG_PREFIX_BASE="$(echo $IMG_REPO:$IMG_JOB_NAME | tr '[:upper:]' '[:lower:]')."
   IMG_PREFIX_BN="$(echo ${IMG_PREFIX_BASE}$IMG_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
-  IMG_PREFIX_CS="$REPO_PREFIX_BN-$(changeset_short "$CHANGESET")"
+  IMG_PREFIX_CS="$IMG_PREFIX_BN-$(changeset_short "$CHANGESET")"
 }
