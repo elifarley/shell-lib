@@ -1,4 +1,7 @@
 #!/bin/sh
+CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
+for lib in container-img-naming
+  do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 docker_build() {
   local tag="$1"; test $# -eq 0 || shift
@@ -12,7 +15,7 @@ docker_build_archive() {
   local pushinfopath='docker-push.info'
   test -s "$context_archive" || context_archive="$context_root"/app.tgz
 
-  printf 'Building Docker image "%s"\nfrom context ' "$REPO_PREFIX_CS"
+  printf 'Building Docker image "%s"\nfrom context ' "$tag"
   if test -s "$context_archive"; then
     printf "archive at '%s'...\n\n" "$(readlink -f "$context_archive")"
     docker_build "$tag" "$@" - <"$context_archive" || return
@@ -30,36 +33,24 @@ docker_build_archive() {
 }
 
 jenkins_docker_push() {
-  test $# -ge 2 || {
-    printf 'Parameters:\n\nREPO_PREFIX\nUPSTREAM_JOB_NAME\n<UPSTREAM_BUILD_NUMBER>\n<CHANGESET>'
-    return 1
-  }
+  set_img_vars "$@" || return $?
 
-  local REPO_PREFIX="$(echo $1 | tr '[:upper:]' '[:lower:]')"; shift
-  local UPSTREAM_JOB_NAME="$1"; test $# -gt 0 && shift
-  local UPSTREAM_BUILD_NUMBER="${1:-$(id -nu)-at-$(hostname -s)}"; test $# -gt 0 && shift
-  local CHANGESET="${1:-$(git rev-parse HEAD)}"
-
-  REPO_PREFIX="$(echo $REPO_PREFIX:$UPSTREAM_JOB_NAME | tr '[:upper:]' '[:lower:]')."
-  local REPO_PREFIX_BN="$(echo ${REPO_PREFIX}$UPSTREAM_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
-  local REPO_PREFIX_CS="$REPO_PREFIX_BN-$(printf '%.7s' "$CHANGESET")"
-
-  docker_build_archive "$REPO_PREFIX_CS" || return
-  docker tag "$REPO_PREFIX_CS" "$REPO_PREFIX_BN" || return
-  docker tag "$REPO_PREFIX_CS" "${REPO_PREFIX}latest" || return
+  docker_build_archive "$IMG_PREFIX_CS" || return
+  docker tag "$IMG_PREFIX_CS" "$IMG_PREFIX_BN" || return
+  docker tag "$IMG_PREFIX_CS" "${IMG_PREFIX_BASE}latest" || return
 
   echo "Pushing 3 tags..."
-  docker push "${REPO_PREFIX}latest" || return
-  docker push "$REPO_PREFIX_BN" || return
-  docker push "$REPO_PREFIX_CS" || return
+  docker push "${IMG_PREFIX_BASE}latest" || return
+  docker push "$IMG_PREFIX_BN" || return
+  docker push "$IMG_PREFIX_CS" || return
 
   cat <<EOF
 
 To pull this image, type:
-docker pull $REPO_PREFIX_CS
+docker pull $IMG_PREFIX_CS
 
 
-$0: Done.
+$0: DONE.
 EOF
 }  
 
