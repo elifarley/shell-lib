@@ -3,7 +3,7 @@ userAtHost() {
 }
 
 chageset() {
-  git 2>/dev/null rev-parse HEAD
+  echo "${GIT_COMMIT:-$(git 2>/dev/null rev-parse HEAD)}"
 }
 
 changeset_short() {
