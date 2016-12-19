@@ -34,8 +34,8 @@ keytool_import_certs() {
         -keystore "$keystore" || return
     } || v='Importing'
     printf '%s "%s"...\n' "$v" "$(basename "$cert")"
-    keytool 2>&1 -import -file "$cert" -alias "$(basename "$cert")" -noprompt -storepass "$storepass" \
-    -keystore "$keystore" | grep -v JAVA_TOOL_OPTIONS || return
+    { keytool 2>&1 -import -file "$cert" -alias "$(basename "$cert")" -noprompt -storepass "$storepass" \
+    -keystore "$keystore" || return ;} | grep -v JAVA_TOOL_OPTIONS
     count=$((count + 1))
   done
 
