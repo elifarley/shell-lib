@@ -2,12 +2,12 @@ userAtHost() {
   echo $(id -nu)-at-$(hostname -s)
 }
 
-chageset() {
+changeset() {
   echo "${GIT_COMMIT:-$(git 2>/dev/null rev-parse HEAD)}"
 }
 
 changeset_short() {
-  printf '%.7s' "${1:-$(chageset)}"
+  printf '%.7s' "${1:-$(changeset)}"
 }
 
 set_img_vars() {
