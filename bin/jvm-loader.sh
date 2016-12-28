@@ -2,9 +2,12 @@
 # See https://wiki.apache.org/tomcat/HowTo/FasterStartUp#Entropy_Source
 
 jvm_loader() {
-  local project_root="${1:-$PWD}"
+  local project_root
   local count
   local app_exec
+
+  test "$1" != '--' && project_root="$1" || project_root="$PWD"
+  shift
 
   echo "[jvm_loader] App root: '$project_root'"
 
