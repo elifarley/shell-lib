@@ -58,7 +58,7 @@ generate_dockerfile_and_archive() {
   test "$ptype" = jvm && {
     dockerfile_dir="$project_root"/target
     local gradle_dist
-    gradle_dist="$(find "$project_root"/build/distributions/ -name '*.tar')"
+    gradle_dist="$(find 2>/dev/null "$project_root"/build/distributions/ -name '*.tar')"
     test "$gradle_dist" && ptype=jvm:gradle
   }
   case "$ptype" in
@@ -73,6 +73,9 @@ generate_dockerfile_and_archive() {
       }
       ;;
     jvm)
+      # Remove jar without dependencies if "*-jar-with-dependencies.jar" exists
+      find "$dockerfile_dir" -name '*-jar-with-dependencies.jar' >/dev/null && \
+        find "$dockerfile_dir"/ ! -name '*-jar-with-dependencies.jar' -name '*.jar' -exec rm -f {} +
       local jars=("$dockerfile_dir"/*.jar)
       test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$dockerfile_dir"/}") || {
         test -f "$dockerfile_dir"/app.jar || {
