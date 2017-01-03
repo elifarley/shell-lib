@@ -114,7 +114,7 @@ generate_dockerfile_and_archive() {
     } ;;
 
     bin*) test -e "$dockerfile_dir"/app.sh && echo "'app.sh' already exists" || {
-      cat <<-EOF > "$dockerfile_dir"/app.sh || return
+      cat <<-'EOF' > "$dockerfile_dir"/app.sh || return
 #!/bin/sh
 exec bin/app "$@"
 EOF
