@@ -39,7 +39,8 @@ detect_project_python() {
 }
 
 detect_project_bin() {
-  dir_not_empty "${1:-.}"/bin/*
+  dir_not_empty "${1:-.}"/bin/* || \
+  dir_not_empty "${1:-.}"/target/bin/*
 }
 
 test "$DEBUG" && set -x
