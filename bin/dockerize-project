@@ -59,12 +59,18 @@ generate_dockerfile_and_archive() {
   local dockerfile_dir="$project_root"
   local tar_params=()
   local all_included=''
-  test "$ptype" = jvm && {
-    dockerfile_dir="$project_root"/target
-    local gradle_dist
-    gradle_dist="$(find 2>/dev/null "$project_root"/build/distributions/ -name '*.tar')"
-    test "$gradle_dist" && ptype=jvm:gradle
-  }
+  case "$ptype" in
+    jvm)
+      dockerfile_dir="$project_root"/target
+      local gradle_dist
+      gradle_dist="$(find 2>/dev/null "$project_root"/build/distributions/ -name '*.tar')"
+      test "$gradle_dist" && ptype=jvm:gradle
+      ;;
+    bin*)
+      test -d "$project_root"/target/bin && dockerfile_dir="$project_root"/target
+      ;;
+  esac
+
   case "$ptype" in
     jvm:gradle)
       tar_params+=(.); all_included=T
