@@ -90,8 +90,11 @@ generate_dockerfile_and_archive() {
       ;;
     bin*)
         test -d "$dockerfile_dir"/bin || { echo "Missing dir '$dockerfile_dir/bin'"; return 1 ;}
-        local executables=("$dockerfile_dir"/bin/*) && \
-        test ${#executables[@]} -ge 1 && test -e "${executables[0]}" && \
+        local executables=("$dockerfile_dir"/bin/*) \
+        &&  test ${#executables[@]} -ge 1 \
+        && test -e "${executables[0]}" \
+        && test "$(basename "${executables[0]}")" != 'app' \
+        && \
           ln -s "$(basename "${executables[0]}")" "$dockerfile_dir"/bin/app
         tar_params+=(bin)
       ;;
