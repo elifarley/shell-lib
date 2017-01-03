@@ -32,8 +32,12 @@ EOF
       base_image='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
     jvm*)
       base_image='elifarley/docker-cep:alpine-jdk-8-copycontext' ;;
+    bin*)
+      base_image='elifarley/docker-cep:alpine-copycontext' ;;
     *)
+      echo "Unknown project type: '$ptype'. Try defining an env var 'BASE_IMAGE' or creating a Dockerfile"
       return 1
+      ;;
   esac
 
   cat > "$dockerfile_dir"/Dockerfile <<-EOF
@@ -84,19 +88,40 @@ generate_dockerfile_and_archive() {
         tar_params+=(app.jar)
       }
       ;;
+    bin*)
+        test -d "$dockerfile_dir"/bin || { echo "Missing dir '$dockerfile_dir/bin'"; return 1 ;}
+        local executables=("$dockerfile_dir"/bin/*) && \
+        test ${#executables[@]} -ge 1 && test -e "${executables[0]}" && \
+          ln -s "$(basename "${executables[0]}")" "$dockerfile_dir"/bin/app
+        tar_params+=(bin)
+      ;;
     *) tar_params+=(.); all_included=T ;;
   esac
 
   case "$ptype" in
+
     jvm*) test -e "$dockerfile_dir"/app.sh && echo "'app.sh' already exists" || {
       cp -v "$CMD_BASE"/jvm-loader.sh "$dockerfile_dir"/app.sh || return
     } ;;
+
+    bin*) test -e "$dockerfile_dir"/app.sh && echo "'app.sh' already exists" || {
+      cat <<-EOF > "$dockerfile_dir"/app.sh || return
+        #!/bin/sh
+        exec bin/app
+EOF
+    } ;;
+
   esac
 
-  test ! "$all_included" && \
+  test ! "$all_included" && {
+
     local appfiles=("$dockerfile_dir"/*app*.sh) && \
     test ${#appfiles[@]} -gt 1 -o -e "$appfiles" && \
       tar_params+=("${appfiles[@]#"$dockerfile_dir"/}")
+
+    test -e "$dockerfile_dir"/config && tar_params+=(config)
+
+  }
 
   local extra_files='Dockerfile .dockerignore'
   test "$project_root" != "$dockerfile_dir" && \
