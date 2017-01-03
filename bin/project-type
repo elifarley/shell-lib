@@ -6,7 +6,7 @@ for lib in base file
 detect_project_type() {
   local project_root="$(readlink -f "${1:-.}")"; shift
   local ptypefun
-  for ptype in ruby jvm nodejs python; do
+  for ptype in ruby jvm nodejs python bin; do
     ptypefun="detect_project_$ptype"
     hascmd "$ptypefun" || continue
     eval "$ptypefun" && echo $ptype && return
@@ -36,6 +36,10 @@ detect_project_python() {
   dir_not_empty "${1:-.}"/*.py || \
   test -f "${1:-.}"/requirements.txt || \
   grep 2>/dev/null -q 'pip ' "${1:-.}"/Makefile
+}
+
+detect_project_bin() {
+  dir_not_empty "${1:-.}"/bin/*
 }
 
 test "$DEBUG" && set -x
