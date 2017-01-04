@@ -91,7 +91,7 @@ areYouSure() {
 create_empty_zip() {
   echo "Creating empty zip: '$1'"
   rmdir_if_exists "$1" || return
-  "$JAVA_HOME"/bin/jar Mcvf "$1" no-file 2> nul
+  "$JAVA_HOME"/bin/jar Mcvf "$1" no-file 2>/dev/null
   test -e "$1"
 }
 
