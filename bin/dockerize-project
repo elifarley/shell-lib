@@ -88,7 +88,7 @@ generate_dockerfile_and_archive() {
         find "$dockerfile_dir"/ ! -name '*-jar-with-dependencies.jar' -name '*.jar' -exec rm -f {} +
       local jars=("$dockerfile_dir"/*.jar)
       test ${#jars[@]} -gt 1 && tar_params+=("${jars[@]#"$dockerfile_dir"/}") || {
-        test -f "$dockerfile_dir"/app.jar || {
+        test -e "$dockerfile_dir"/app.jar || {
           mv "$dockerfile_dir"/*.jar "$dockerfile_dir"/app.jar || return
         }
         tar_params+=(app.jar)
@@ -99,7 +99,7 @@ generate_dockerfile_and_archive() {
         local executables=("$dockerfile_dir"/bin/*) \
         &&  test ${#executables[@]} -ge 1 \
         && test -e "${executables[0]}" \
-        && test "$(basename "${executables[0]}")" != 'app' \
+        && test ! -e "$dockerfile_dir"/bin/app \
         && \
           ln -s "$(basename "${executables[0]}")" "$dockerfile_dir"/bin/app
         tar_params+=(bin)
