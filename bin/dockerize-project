@@ -96,6 +96,7 @@ generate_dockerfile_and_archive() {
       }
       ;;
     bin*)
+        tar_params+=(bin)
         test -d "$dockerfile_dir"/bin || { echo "Missing dir '$dockerfile_dir/bin'"; return 1 ;}
         local executables=("$dockerfile_dir"/bin/*) \
         &&  test ${#executables[@]} -ge 1 \
@@ -103,7 +104,7 @@ generate_dockerfile_and_archive() {
         && test ! -e "$dockerfile_dir"/bin/app \
         && \
           ln -s "$(basename "${executables[0]}")" "$dockerfile_dir"/bin/app
-        tar_params+=(bin)
+        test -e "$dockerfile_dir"/bin/app || { echo "Missing executable in '$dockerfile_dir/bin'"; ls -lhFa "$dockerfile_dir"/bin; return 1 ;}
       ;;
     *) tar_params+=(.); all_included=T ;;
   esac
