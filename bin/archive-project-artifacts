@@ -30,7 +30,7 @@ archive_artifacts() {
 
   test -d "$archive_target"/target && archive_target="$archive_target"/target
 
-  adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$JOB_NAME".XXXXXXX)"
+  adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$(basename "$JOB_NAME")".XXXXXXX)"
   test -d "$adir" || return 1
 
   build_info >> "$project_root"/build-info.txt
