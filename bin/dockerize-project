@@ -84,7 +84,7 @@ generate_dockerfile_and_archive() {
       ;;
     jvm)
       # Remove jar without dependencies if "*-jar-with-dependencies.jar" exists
-      test "$(find "$dockerfile_dir"/ -name '*-jar-with-dependencies.jar' -print -quit)" && \
+      test "$(find "$dockerfile_dir"/ -name '*-jar-with-dependencies.jar' -print)" && \
         find "$dockerfile_dir"/ ! -name '*-jar-with-dependencies.jar' -name '*.jar' -exec rm -f {} +
 
       local jars=("$dockerfile_dir"/*.jar)
