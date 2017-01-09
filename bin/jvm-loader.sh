@@ -6,7 +6,7 @@ jvm_loader() {
   local count
   local app_exec
 
-  test "$1" != '--' && project_root="$1" || project_root="$PWD"
+  test "$1" -a "$1" != '--' && project_root="$1" || project_root="$PWD"
   shift
 
   echo "[jvm_loader] App root: '$project_root'"
