@@ -29,7 +29,7 @@ EOF
     ruby)
       base_image='elifarley/docker-rails:rails-4.2.5.1' ;;
     nodejs)
-      base_image='elifarley/docker-dev-env:debian-node-onbuild' ;;
+      base_image='elifarley/docker-cep:debian-node-onbuild' ;;
     python)
       base_image='elifarley/docker-dev-env:alpine-sshd-python-2.7' ;;
     jvm*)
