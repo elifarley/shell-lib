@@ -1,6 +1,17 @@
 # Disable file globbing; coalesce inner whitespace;
 # trim leading and trailing whitespace
-trim() { (set -f; echo $@) ;} # TODO Does not work in ZSH
+if test "$ZSH_VERSION"; then
+  trim() {
+    local result="$(echo $*)"
+    local tmp="${result##*[^ ]}"
+    result="${result%${tmp}}"
+    tmp="${result%%[^ ]*}"
+    echo ${result#${tmp}}
+  }
+else
+  trim() { (set -f; echo $@) ;}
+fi
+
 strcontains() { test -z "${1##*$2*}" ; }; shell_name bash && export -f strcontains
 strendswith() { test ! "${1%%*$2}"; }
 strstartswith() { test ! "${1##$2*}"; }
