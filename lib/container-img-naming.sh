@@ -9,12 +9,12 @@ set_img_vars() {
   }
 
   local IMG_REPO="$(echo ${1:-$IMG_REPO})"; test $# -gt 0 && shift
-  test "${IMG_REPO// /}" || {
+  test "$IMG_REPO" || {
     local cprops="$(find .. . -maxdepth 1 -name container.properties)"
     test "$cprops" -a -s "$cprops" && \
     IMG_REPO="$(getprop "$cprops" IMG_REPO)"
   }
-  IMG_REPO="$(echo ${IMG_REPO// /-} | tr '[:upper:]' '[:lower:]')"
+  IMG_REPO="$(echo $IMG_REPO | tr '[:upper:]' '[:lower:]')"
   test "$IMG_REPO" || {
     echo '"$IMG_REPO" is empty'; return 1
   }
