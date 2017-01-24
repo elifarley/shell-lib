@@ -34,8 +34,11 @@ archive_artifacts() {
   adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$(basename "$JOB_NAME")".XXXXXXX)"
   test -d "$adir" || return 1
 
-  test -z "${IMG_REPO// /}" -a -s "$project_root"/container.properties && \
-    IMG_REPO="$(getprop "$project_root"/container.properties IMG_REPO)"
+  test "${IMG_REPO// /}" || {
+    local cprops="$(find .. . -maxdepth 1 -name container.properties)"
+    test "$cprops" -a -s "$cprops" && \
+    IMG_REPO="$(getprop "$cprops" IMG_REPO)"
+  }
 
   build_info "$IMG_REPO" >> "$project_root"/build-info.txt || return
   local extra_tar_items; test "$*" = '.' || extra_tar_items=build-info.txt
