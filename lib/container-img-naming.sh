@@ -16,7 +16,7 @@ set_img_vars() {
     return 1
   }
 
-  local IMG_REPO="$(echo ${1:-$IMG_REPO} | tr '[:upper:]' '[:lower:]')"; shift
+  local IMG_REPO="$(echo ${1:-$IMG_REPO} | tr '[:upper:]' '[:lower:]')"; test $# -gt 0 && shift
   local IMG_JOB_NAME="$(echo "${1:-$JOB_NAME}" | tr '/' '.')"; test $# -gt 0 && shift
   local IMG_BUILD_NUMBER="${1:-${BUILD_NUMBER:-$(userAtHost)}}"; test $# -gt 0 && shift
   local CHANGESET="${1:-${GIT_COMMIT:-$(chageset)}}"
