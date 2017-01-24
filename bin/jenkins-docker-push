@@ -33,7 +33,7 @@ docker_build_archive() {
 }
 
 jenkins_docker_push() {
-  set_img_vars "$@" || return $?
+  set_img_vars "$@" || return
 
   docker_build_archive "$IMG_PREFIX_CS" || return
   docker tag "$IMG_PREFIX_CS" "$IMG_PREFIX_BN" || return

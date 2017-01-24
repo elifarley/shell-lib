@@ -27,7 +27,7 @@ safe_rm() {
   for i in "$@"; do
     test '/' = "$i" && echo "Invalid path: '$i'" && return 1
     test -e "$i" || continue
-    echo "Removing '$i'..." && mv "$i" "$i$suffix" && rm -rf "$i$suffix" || return $?
+    echo "Removing '$i'..." && mv "$i" "$i$suffix" && rm -rf "$i$suffix" || return
   done
   return 0
 }
@@ -42,7 +42,7 @@ rmdir_if_exists() {
   local p; for p in "$@"; do
     test -e "$p" || continue
     echo "Removing '$p'"
-    rm -r "$p" || return $?
+    rm -r "$p" || return
   done
 }; shell_name bash && export -f rmdir_if_exists
 
@@ -62,7 +62,7 @@ cpdir() {
   local src="$1"; shift
   local dest="$1"; shift
   local include_all=''; strendswith "$src" / && include_all='*'
-  test -e "$dest" || { mkdir "$dest" || return $?; }
+  test -e "$dest" || { mkdir "$dest" || return; }
   cp -dr "$src"$include_all "$dest"
 }
 
@@ -78,6 +78,6 @@ cpdirm() {
     }
     cpargs="$cpargs '$p'"
   done
-  test -e "$dest" || { mkdir "$dest" || return $?; }
+  test -e "$dest" || { mkdir "$dest" || return; }
   eval cp -dr $cpargs
 }
