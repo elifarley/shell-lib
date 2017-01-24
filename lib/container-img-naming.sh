@@ -17,7 +17,6 @@ set_img_vars() {
     echo '"$IMG_REPO" is empty'; return 1
   }
 
-}
   IMG_PREFIX_BASE="$(echo $IMG_REPO:$IMG_JOB_NAME | tr '[:upper:]' '[:lower:]')."
   IMG_PREFIX_BN="$(echo ${IMG_PREFIX_BASE}$IMG_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
   IMG_PREFIX_CS="$IMG_PREFIX_BN-$(changeset_short "$CHANGESET")"
