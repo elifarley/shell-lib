@@ -5,9 +5,8 @@ for lib in vcs str container-img-naming
 do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 build_info() {
-  local IMG_REPO="${1:-$IMG_REPO}"
   local CHANGESET="$(changeset)"
-  set_img_vars "$IMG_REPO" "$JOB_NAME" "$BUILD_NUMBER" "$CHANGESET" || return
+  set_img_vars "$JOB_NAME" "$BUILD_NUMBER" "$CHANGESET" "$IMG_REPO" || return
 
   printf 'BUILD_DATE="%s %s"\n' "$(date +'%F %T.%N')" "$(date +%Z)"
   printf "IMAGE_NAME='%s'\n" "$IMG_PREFIX_CS"
@@ -34,7 +33,7 @@ archive_artifacts() {
   adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$(basename "$JOB_NAME")".XXXXXXX)"
   test -d "$adir" || return 1
 
-  build_info "$IMG_REPO" >> "$project_root"/build-info.txt || return
+  build_info >> "$project_root"/build-info.txt || return
   local extra_tar_items; test "$*" = '.' || extra_tar_items=build-info.txt
 
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \

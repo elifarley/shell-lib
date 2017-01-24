@@ -10,11 +10,15 @@ getprop_container() {
 
 set_img_vars() {
   test $# -ge 2 || {
-    printf 'Parameters:\n\nIMG_REPO\nIMG_NAME\n<BUILD_NUMBER>\n<CHANGESET>'
+    printf 'Parameters:\n\nIMG_NAME\n<BUILD_NUMBER>\n<CHANGESET>\nIMG_REPO'
     return 1
   }
 
-  local IMG_REPO="$(echo ${1:-$IMG_REPO})"; test $# -gt 0 && shift
+  local IMG_NAME="$(echo "${1:-$JOB_NAME}" | tr '/ ' '.-')"; test $# -gt 0 && shift
+  local IMG_BUILD_NUMBER="$(echo ${1:-${BUILD_NUMBER:-$(userAtHost)}} | tr '/ ' '.-' )"; test $# -gt 0 && shift
+  local CHANGESET="${1:-$(chageset)}"; test $# -gt 0 && shift
+
+  local IMG_REPO="$(echo ${1:-$IMG_REPO})"
   IMG_REPO="${IMG_REPO:-$(getprop_container IMG_REPO)}"
   IMG_REPO="$(echo $IMG_REPO | tr ' ' '-')"
   test "$IMG_REPO" || {
@@ -24,10 +28,6 @@ IMG_REPO=mycompany/my-repo
 EOF
  return 0
   }
-
-  local IMG_NAME="$(echo "${1:-$JOB_NAME}" | tr '/ ' '.-')"; test $# -gt 0 && shift
-  local IMG_BUILD_NUMBER="$(echo ${1:-${BUILD_NUMBER:-$(userAtHost)}} | tr '/ ' '.-' )"; test $# -gt 0 && shift
-  local CHANGESET="${1:-$(chageset)}"
 
   IMG_PREFIX_BASE="$(echo $IMG_REPO:$IMG_NAME | tr '[:upper:]' '[:lower:]')."
   IMG_PREFIX_BN="$(echo ${IMG_PREFIX_BASE}$IMG_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
