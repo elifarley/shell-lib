@@ -16,7 +16,7 @@ charexists() {
 
 # Get the value of a key in a properties file
 # Usage: getprop <file path> <key>
-getprop() { trim "$(grep -m1 "^\s*${2/./\\\\.}\s*=" "$1" | cut -d= -f2-)" ;}
+getprop() { trim "$(grep -m1 "^\s*$(echo $2 | tr -s . '\.')\s*=" "$1" | cut -d= -f2-)" ;}
 
 escape_quotes() {
   result=''
