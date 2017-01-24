@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 CMD_BASE="$(readlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
 
-for lib in vcs container-img-naming
+for lib in vcs str container-img-naming
 do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 build_info() {
+  local IMG_REPO="${1:-$IMG_REPO}"
   local CHANGESET="$(changeset)"
   set_img_vars "$IMG_REPO" "$JOB_NAME" "$BUILD_NUMBER" "$CHANGESET"
 
@@ -21,19 +22,22 @@ EOF
 }
 
 archive_artifacts() {
-  local project_root="$(readlink -f "${1:-.}")"; shift
+  local project_root="$(readlink -f "${1:-.}")"; test $# -gt 0 && shift
   local archive_target; archive_target="$(readlink -f "${1:-.}")" || {
     echo "Invalid path: '$1'"
     return 1;
   }
-  shift
+  test $# -gt 0 && shift
 
   test -d "$archive_target"/target && archive_target="$archive_target"/target
 
   adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$(basename "$JOB_NAME")".XXXXXXX)"
   test -d "$adir" || return 1
 
-  build_info >> "$project_root"/build-info.txt
+  test -z "${IMG_REPO// /}" -a -s "$project_root"/container.properties && \
+    IMG_REPO="$(getprop "$project_root"/container.properties IMG_REPO)"
+
+  build_info "$IMG_REPO" >> "$project_root"/build-info.txt
   local extra_tar_items; test "$*" = '.' || extra_tar_items=build-info.txt
 
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
