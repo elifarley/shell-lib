@@ -14,7 +14,7 @@ set_img_vars() {
     test "$cprops" -a -s "$cprops" && \
     IMG_REPO="$(getprop "$cprops" IMG_REPO)"
   }
-  IMG_REPO="$(echo $IMG_REPO | tr '[:upper:]' '[:lower:]')"
+  IMG_REPO="$(echo $IMG_REPO | tr ' ' '-')"
   test "$IMG_REPO" || {
     cat <<-EOF
 ERROR: "\$IMG_REPO" is empty. You can also create a file named 'container.properties' with content like this:
@@ -23,8 +23,8 @@ EOF
  return 0
   }
 
-  local IMG_JOB_NAME="$(echo "${1:-$JOB_NAME}" | tr '/' '.')"; test $# -gt 0 && shift
-  local IMG_BUILD_NUMBER="${1:-${BUILD_NUMBER:-$(userAtHost)}}"; test $# -gt 0 && shift
+  local IMG_JOB_NAME="$(echo "${1:-$JOB_NAME}" | tr '/ ' '.-')"; test $# -gt 0 && shift
+  local IMG_BUILD_NUMBER="$(echo ${1:-${BUILD_NUMBER:-$(userAtHost)}} | tr '/ ' '.-' )"; test $# -gt 0 && shift
   local CHANGESET="${1:-$(chageset)}"
 
   IMG_PREFIX_BASE="$(echo $IMG_REPO:$IMG_JOB_NAME | tr '[:upper:]' '[:lower:]')."
