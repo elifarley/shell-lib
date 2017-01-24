@@ -12,7 +12,7 @@ changeset_short() {
 
 set_img_vars() {
   test $# -ge 2 || {
-    printf 'Parameters:\n\nIMG_REPO\nUJOB_NAME\n<BUILD_NUMBER>\n<CHANGESET>'
+    printf 'Parameters:\n\nIMG_REPO\nJOB_NAME\n<BUILD_NUMBER>\n<CHANGESET>'
     return 1
   }
 
