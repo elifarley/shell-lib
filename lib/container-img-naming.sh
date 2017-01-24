@@ -17,7 +17,7 @@ set_img_vars() {
   IMG_REPO="$(echo $IMG_REPO | tr '[:upper:]' '[:lower:]')"
   test "$IMG_REPO" || {
     cat <<-EOF
-ERROR: "$IMG_REPO" is empty. You can also create a file named 'container.properties' with content like this:
+ERROR: "\$IMG_REPO" is empty. You can also create a file named 'container.properties' with content like this:
 IMG_REPO=mycompany/my-repo
 EOF
  return 0
