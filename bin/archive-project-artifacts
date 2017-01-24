@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
+CMD_BASE="$(readlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
 
-for lib in container-img-naming
+for lib in vcs container-img-naming
 do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 build_info() {

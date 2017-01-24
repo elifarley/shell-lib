@@ -2,14 +2,6 @@ userAtHost() {
   echo $(id -nu)-at-$(hostname -s)
 }
 
-changeset() {
-  echo "${GIT_COMMIT:-$(if test -d "$1"; then cd "$1"; fi; git 2>/dev/null rev-parse HEAD)}"
-}
-
-changeset_short() {
-  printf '%.7s' "${1:-$(changeset)}"
-}
-
 set_img_vars() {
   test $# -ge 2 || {
     printf 'Parameters:\n\nIMG_REPO\nJOB_NAME\n<BUILD_NUMBER>\n<CHANGESET>'
