@@ -16,7 +16,11 @@ set_img_vars() {
   }
   IMG_REPO="$(echo $IMG_REPO | tr '[:upper:]' '[:lower:]')"
   test "$IMG_REPO" || {
-    echo '"$IMG_REPO" is empty'; return 1
+    cat <<-EOF
+"$IMG_REPO" is empty. You can also create a file named 'container.properties' with content like this:
+IMG_REPO=mycompany/my-repo
+EOF
+ return 0
   }
 
   local IMG_JOB_NAME="$(echo "${1:-$JOB_NAME}" | tr '/' '.')"; test $# -gt 0 && shift
