@@ -1,6 +1,6 @@
 #!/bin/sh
 CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
-for lib in vcs container-img-naming
+for lib in vcs str container-img-naming
   do . "$CMD_BASE"/../lib/"$lib".sh; done
 
 docker_build() {
