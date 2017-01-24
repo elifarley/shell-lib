@@ -9,7 +9,7 @@ ht_get() {
     [[ "$i" =~ '=' ]] || { echo "[ht_get] ERROR: Missing equals sign: '$i'" | STDERR; return 1; }
     k=${i%%=*}; v=${i#*=}; _dict[$(ht $k)]="$v"
   done
-  local result; test "$(shell_name)" = 'bash' && result="${_dict[$(ht $key)]}" || {
+  local result; shell_name bash && result="${_dict[$(ht $key)]}" || {
     echo "Shell not supported: $(shell_name)"
     return 1
   }
