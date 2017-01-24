@@ -1,6 +1,6 @@
 # Disable file globbing; coalesce inner whitespace;
 # trim leading and trailing whitespace
-trim() { (set -f; echo $@) ;}
+trim() { (set -f; echo $@) ;} # TODO Does not work in ZSH
 strcontains() { test -z "${1##*$2*}" ; }; shell_name bash && export -f strcontains
 strendswith() { test ! "${1%%*$2}"; }
 strstartswith() { test ! "${1##$2*}"; }
@@ -13,6 +13,10 @@ charexists() {
   local char="$1"; shift
   case "$*" in *"$char"*) return;; esac; return 1
 }
+
+# Get the value of a key in a properties file
+# Usage: getprop <file path> <key>
+getprop() { trim "$(grep -m1 "^\s*${2/./\\\\.}\s*=" "$1" | cut -d= -f2-)" ;}
 
 escape_quotes() {
   result=''
