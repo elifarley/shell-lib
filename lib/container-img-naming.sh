@@ -9,6 +9,7 @@ update_container_props_path() {
   test -s "$CONTAINER_PROPERTIES_PATH" && return
   CONTAINER_PROPERTIES_PATH="$(find .. . -maxdepth 1 -name container.properties)"
   test "$CONTAINER_PROPERTIES_PATH" || CONTAINER_PROPERTIES_PATH=container.properties
+  echo >> "$CONTAINER_PROPERTIES_PATH"
 }
 
 getprop_container() {
