@@ -41,8 +41,9 @@ docker_build_archive() {
 jenkins_docker_push() {
 
   local context_archive="$(find_context_archive .)"
-  test -s "$(dirname "$context_archive")"/container.properties || \
-    tar -zxvf "$context_archive" -C "$(dirname "$context_archive")" ./container.properties
+  test -s "$(dirname "$context_archive")"/container.properties || for prefix in './' ''; do
+    tar -zxvf "$context_archive" -C "$(dirname "$context_archive")" ${prefix}container.properties && break
+  done
 
   set_img_vars "$@" || return
 
