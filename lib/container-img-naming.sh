@@ -36,7 +36,7 @@ set_img_vars() {
   IMG_REPO="${IMG_REPO:-$(getprop_container IMG_REPO)}"
   IMG_REPO="$(echo $IMG_REPO | tr ' ' '-')"
   test "$IMG_REPO" || {
-    cat <<-EOF
+    cat <<-EOF 1>&2
 ERROR: "\$IMG_REPO" is empty. You can also create a file named 'container.properties' with content like this:
 IMG_REPO=mycompany/my-repo
 EOF
