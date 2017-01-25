@@ -18,13 +18,15 @@ set_img_vars() {
     return 1
   }
 
-  local IMG_NAME="${1:-$(getprop_container IMG_NAME '$JOB_NAME')}"; test $# -gt 0 && shift
-  IMG_NAME="$(echo "$IMG_NAME" | tr '/ ' '.-')"
+  local IMG_NAME="${1:-$JOB_NAME}; test $# -gt 0 && shift
+  IMG_NAME="$(echo $(getprop_container IMG_NAME '$IMG_NAME') | tr '/ ' '.-')"
 
-  local IMG_BUILD_NUMBER="${1:-$(getprop_container IMG_BUILD_NUMBER '${BUILD_NUMBER:-$(userAtHost)}')}"; test $# -gt 0 && shift
+  local IMG_BUILD_NUMBER="${1:-$BUILD_NUMBER}"; test $# -gt 0 && shift
+  IMG_BUILD_NUMBER="$(getprop_container IMG_BUILD_NUMBER '${IMG_BUILD_NUMBER:-$(userAtHost)}')"
   IMG_BUILD_NUMBER="$(echo "$IMG_BUILD_NUMBER" | tr '/ ' '.-')"
 
-  local IMG_CHANGESET="${1:-$(getprop_container IMG_CHANGESET '$(changeset)')}"; test $# -gt 0 && shift
+  local IMG_CHANGESET="${1:-$CHANGESET}"; test $# -gt 0 && shift
+  IMG_CHANGESET="$(getprop_container IMG_CHANGESET '${IMG_CHANGESET:-$(changeset)}')"
   IMG_CHANGESET="$(echo "$IMG_CHANGESET" | tr '/ ' '.-')"
 
   local IMG_REPO="$(echo ${1:-$IMG_REPO})"
