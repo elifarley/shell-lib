@@ -1,3 +1,4 @@
+#@IgnoreInspection BashAddShebang
 userAtHost() {
   echo $(id -nu)-at-$(hostname -s)
 }
@@ -14,9 +15,14 @@ set_img_vars() {
     return 1
   }
 
-  local IMG_NAME="$(echo "${1:-$JOB_NAME}" | tr '/ ' '.-')"; test $# -gt 0 && shift
-  local IMG_BUILD_NUMBER="$(echo ${1:-${BUILD_NUMBER:-$(userAtHost)}} | tr '/ ' '.-' )"; test $# -gt 0 && shift
-  local CHANGESET="${1:-$(chageset)}"; test $# -gt 0 && shift
+  local IMG_NAME="${1:-$(getprop_container IMG_NAME)}"; test $# -gt 0 && shift
+  IMG_NAME="$(echo "${IMG_NAME:-$JOB_NAME}" | tr '/ ' '.-')"
+
+  local IMG_BUILD_NUMBER="${1:-$(getprop_container IMG_BUILD_NUMBER)}"; test $# -gt 0 && shift
+  IMG_BUILD_NUMBER="$(echo "${IMG_BUILD_NUMBER:-${BUILD_NUMBER:-$(userAtHost)}}" | tr '/ ' '.-')"
+
+  local IMG_CHANGESET="${1:-$(getprop_container IMG_CHANGESET)}"; test $# -gt 0 && shift
+  IMG_CHANGESET="$(echo "${IMG_CHANGESET:-$(changeset)}" | tr '/ ' '.-')"
 
   local IMG_REPO="$(echo ${1:-$IMG_REPO})"
   IMG_REPO="${IMG_REPO:-$(getprop_container IMG_REPO)}"
@@ -31,5 +37,5 @@ EOF
 
   IMG_PREFIX_BASE="$(echo $IMG_REPO:$IMG_NAME | tr '[:upper:]' '[:lower:]')."
   IMG_PREFIX_BN="$(echo ${IMG_PREFIX_BASE}$IMG_BUILD_NUMBER | tr '[:upper:]' '[:lower:]')"
-  IMG_PREFIX_CS="$IMG_PREFIX_BN-$(changeset_short "$CHANGESET")"
+  IMG_PREFIX_CS="$IMG_PREFIX_BN-$(changeset_short "$IMG_CHANGESET")"
 }
