@@ -5,8 +5,11 @@ userAtHost() {
 
 getprop_container() {
   local cprops="$(find .. . -maxdepth 1 -name container.properties)"
-  test "$cprops" -a -s "$cprops" && \
-    getprop "$cprops" "$1"
+  test "$cprops" -a -s "$cprops" && getprop "$cprops" "$1" && return
+  test "$2" || return
+  cprops="${cprops:-container.properties}"
+  local val="$(eval echo $2)"
+  echo $1=$val >> "$cprops" && echo $val
 }
 
 set_img_vars() {
@@ -15,14 +18,14 @@ set_img_vars() {
     return 1
   }
 
-  local IMG_NAME="${1:-$(getprop_container IMG_NAME)}"; test $# -gt 0 && shift
-  IMG_NAME="$(echo "${IMG_NAME:-$JOB_NAME}" | tr '/ ' '.-')"
+  local IMG_NAME="${1:-$(getprop_container IMG_NAME '$JOB_NAME')}"; test $# -gt 0 && shift
+  IMG_NAME="$(echo "$IMG_NAME" | tr '/ ' '.-')"
 
-  local IMG_BUILD_NUMBER="${1:-$(getprop_container IMG_BUILD_NUMBER)}"; test $# -gt 0 && shift
-  IMG_BUILD_NUMBER="$(echo "${IMG_BUILD_NUMBER:-${BUILD_NUMBER:-$(userAtHost)}}" | tr '/ ' '.-')"
+  local IMG_BUILD_NUMBER="${1:-$(getprop_container IMG_BUILD_NUMBER '${BUILD_NUMBER:-$(userAtHost)}')}"; test $# -gt 0 && shift
+  IMG_BUILD_NUMBER="$(echo "$IMG_BUILD_NUMBER" | tr '/ ' '.-')"
 
-  local IMG_CHANGESET="${1:-$(getprop_container IMG_CHANGESET)}"; test $# -gt 0 && shift
-  IMG_CHANGESET="$(echo "${IMG_CHANGESET:-$(changeset)}" | tr '/ ' '.-')"
+  local IMG_CHANGESET="${1:-$(getprop_container IMG_CHANGESET '$(changeset)')}"; test $# -gt 0 && shift
+  IMG_CHANGESET="$(echo "$IMG_CHANGESET" | tr '/ ' '.-')"
 
   local IMG_REPO="$(echo ${1:-$IMG_REPO})"
   IMG_REPO="${IMG_REPO:-$(getprop_container IMG_REPO)}"
