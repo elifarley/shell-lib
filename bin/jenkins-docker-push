@@ -8,14 +8,20 @@ docker_build() {
   time docker build --pull -t "$tag" "$@"
 }
 
+find_context_archive() {
+  local context_root="${1:-.}"; test $# -eq 0 || shift
+  local context_archive="$context_root"/target/app.tgz
+  test -s "$context_archive" || context_archive="$context_root"/app.tgz
+  echo $context_archive
+}
+
 docker_build_archive() {
   local tag="$1"; shift
   local context_root="${1:-.}"; test $# -eq 0 || shift
-  local context_archive="$context_root"/target/app.tgz
-  local pushinfopath='docker-push.info'
-  test -s "$context_archive" || context_archive="$context_root"/app.tgz
+  local context_archive="${1:-$(find_context_archive "$context_root")}"
 
   printf 'Building Docker image "%s"\nfrom context ' "$tag"
+  local pushinfopath='docker-push.info'
   if test -s "$context_archive"; then
     printf "archive at '%s'...\n\n" "$(readlink -f "$context_archive")"
     docker_build "$tag" "$@" - <"$context_archive" || return
@@ -33,9 +39,14 @@ docker_build_archive() {
 }
 
 jenkins_docker_push() {
+
+  local context_archive="$(find_context_archive .)"
+  test -s "$(dirname "$context_archive")"/container.properties || \
+    tar -zxvf "$context_archive" -C "$(dirname "$context_archive")" container.properties
+
   set_img_vars "$@" || return
 
-  docker_build_archive "$IMG_PREFIX_CS" || return
+  docker_build_archive "$IMG_PREFIX_CS" . "$context_archive" || return
   docker tag "$IMG_PREFIX_CS" "$IMG_PREFIX_BN" || return
   docker tag "$IMG_PREFIX_CS" "${IMG_PREFIX_BASE}latest" || return
 
