@@ -9,7 +9,7 @@ generate_dockerfiles() {
   local ptype="$2"
   local base_image="$BASE_IMAGE"
 
-  cat >"$dockerfile_dir"/.dockerignore <<-'EOF'
+  cat >>"$dockerfile_dir"/.dockerignore <<-'EOF'
 **~
 **.DS_Store
 **nohup.out
