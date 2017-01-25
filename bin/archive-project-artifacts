@@ -2,7 +2,7 @@
 CMD_BASE="$(readlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
 
 for lib in vcs str container-img-naming
-do . "$CMD_BASE"/../lib/"$lib".sh; done
+do . "$CMD_BASE"/../lib/"$lib".sh || exit; done
 
 build_info() {
   local CHANGESET="$(changeset)"
