@@ -34,7 +34,16 @@ archive_artifacts() {
   test -d "$adir" || return 1
 
   build_info >> "$project_root"/build-info.txt || return
-  local extra_tar_items; test "$*" = '.' || extra_tar_items=build-info.txt
+  test "$CONTAINER_PROPERTIES_PATH" -a -s "$CONTAINER_PROPERTIES_PATH" && {
+    test "$project_root/$(basename "$CONTAINER_PROPERTIES_PATH")" != "$(readlink -f "$CONTAINER_PROPERTIES_PATH")" && \
+      cp -av "$CONTAINER_PROPERTIES_PATH" "$project_root"/
+  }
+
+  local extra_tar_items; test "$*" = '.' || {
+    extra_tar_items=build-info.txt
+    test -s "$CONTAINER_PROPERTIES_PATH" && \
+      extra_tar_items="$(basename "$CONTAINER_PROPERTIES_PATH") $extra_tar_items"
+  }
 
   tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
     --exclude-vcs --exclude-backups --exclude-caches \
