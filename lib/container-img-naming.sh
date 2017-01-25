@@ -5,10 +5,14 @@ userAtHost() {
 
 CONTAINER_PROPERTIES_PATH=''
 
+update_container_props_path() {
+  test -s "$CONTAINER_PROPERTIES_PATH" && return
+  CONTAINER_PROPERTIES_PATH="$(find .. . -maxdepth 1 -name container.properties)"
+}
+
 getprop_container() {
-  local cprops="${CONTAINER_PROPERTIES_PATH:-$(find .. . -maxdepth 1 -name container.properties)}"
-  test "$cprops" && export CONTAINER_PROPERTIES_PATH="$cprops"
-  test "$cprops" -a -s "$cprops" && getprop "$cprops" "$1" && return
+  local cprops="$CONTAINER_PROPERTIES_PATH"
+  test -s "$cprops" && getprop "$cprops" "$1" && return
   test "$2" || return
   cprops="${cprops:-container.properties}"
   local val="$(eval echo $2)"
@@ -20,6 +24,8 @@ set_img_vars() {
     printf 'Parameters:\n\nIMG_NAME\n<BUILD_NUMBER>\n<CHANGESET>\nIMG_REPO'
     return 1
   }
+
+  update_container_props_path
 
   local IMG_NAME="${1:-$JOB_NAME}"; test $# -gt 0 && shift
   IMG_NAME="$(echo $(getprop_container IMG_NAME '$IMG_NAME') | tr '/ ' '.-')"
