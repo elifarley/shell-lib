@@ -7,7 +7,7 @@ CONTAINER_PROPERTIES_PATH=''
 
 getprop_container() {
   local cprops="${CONTAINER_PROPERTIES_PATH:-$(find .. . -maxdepth 1 -name container.properties)}"
-  test "$cprops" && CONTAINER_PROPERTIES_PATH="$cprops"
+  test "$cprops" && export CONTAINER_PROPERTIES_PATH="$cprops"
   test "$cprops" -a -s "$cprops" && getprop "$cprops" "$1" && return
   test "$2" || return
   cprops="${cprops:-container.properties}"
