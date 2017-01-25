@@ -18,7 +18,7 @@ set_img_vars() {
     return 1
   }
 
-  local IMG_NAME="${1:-$JOB_NAME}; test $# -gt 0 && shift
+  local IMG_NAME="${1:-$JOB_NAME}"; test $# -gt 0 && shift
   IMG_NAME="$(echo $(getprop_container IMG_NAME '$IMG_NAME') | tr '/ ' '.-')"
 
   local IMG_BUILD_NUMBER="${1:-$BUILD_NUMBER}"; test $# -gt 0 && shift
