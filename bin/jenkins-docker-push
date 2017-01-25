@@ -18,7 +18,7 @@ find_context_archive() {
 docker_build_archive() {
   local tag="$1"; shift
   local context_root="${1:-.}"; test $# -eq 0 || shift
-  local context_archive="${1:-$(find_context_archive "$context_root")}"
+  local context_archive="${1:-$(find_context_archive "$context_root")}"; test $# -eq 0 || shift
 
   printf 'Building Docker image "%s"\nfrom context ' "$tag"
   local pushinfopath='docker-push.info'
