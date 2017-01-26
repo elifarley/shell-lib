@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 CMD_BASE="$(readlink -f $0)" || CMD_BASE="$0"; CMD_BASE="$(dirname $CMD_BASE)"
 for lib in base file
-  do . "$CMD_BASE"/../lib/"$lib".sh; done
+  do . "$CMD_BASE"/../lib/"$lib".sh || exit; done
 
 detect_project_type() {
   local project_root="$(readlink -f "${1:-.}")"; shift
