@@ -15,9 +15,9 @@ update_container_props_path() {
 getprop_container() {
   local cprops="$CONTAINER_PROPERTIES_PATH"
   test -s "$cprops" && getprop "$cprops" "$1" && return
-  test "$2" || return
-  cprops="${cprops:-container.properties}"
   local val="$(eval echo $2)"
+  test "$val" || return
+  cprops="${cprops:-container.properties}"
   echo $1=$val >> "$cprops" && echo $val
 }
 
