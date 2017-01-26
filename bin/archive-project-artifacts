@@ -23,20 +23,23 @@ EOF
 archive_artifacts() {
   local project_root="$(readlink -f "${1:-.}")"; test $# -gt 0 && shift
   local archive_target; archive_target="$(readlink -f "${1:-.}")" || {
-    echo "Invalid path: '$1'"
+    echo 1>&2 "Invalid path: '$1'"
     return 1;
   }
   test $# -gt 0 && shift
 
   test -d "$archive_target"/target && archive_target="$archive_target"/target
 
-  adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$(basename "$JOB_NAME")".XXXXXXX)"
-  test -d "$adir" || return 1
-
   build_info >> "$project_root"/build-info.txt || return
-  test "$CONTAINER_PROPERTIES_PATH" -a -s "$CONTAINER_PROPERTIES_PATH" && {
+
+  local app_excludes="$project_root"/.app-excludes
+  test -s "$project_root"/.dockerignore && cat "$project_root"/.dockerignore >> "$app_excludes"
+
+  test -s "$CONTAINER_PROPERTIES_PATH" && {
+    echo "$(basename "$CONTAINER_PROPERTIES_PATH")" >> "$project_root"/.dockerignore
     test "$project_root/$(basename "$CONTAINER_PROPERTIES_PATH")" != "$(readlink -f "$CONTAINER_PROPERTIES_PATH")" && \
-      cp -av "$CONTAINER_PROPERTIES_PATH" "$project_root"/
+      cp -av "$CONTAINER_PROPERTIES_PATH" "$project_root"/ && \
+      CONTAINER_PROPERTIES_PATH="$project_root/$(basename "$CONTAINER_PROPERTIES_PATH")"
   }
 
   local extra_tar_items; test "$*" = '.' || {
@@ -45,8 +48,14 @@ archive_artifacts() {
       extra_tar_items="$(basename "$CONTAINER_PROPERTIES_PATH") $extra_tar_items"
   }
 
-  tar -zcvf "$adir"/app.tgz --exclude-ignore="$project_root"/.dockerignore \
-    --exclude-vcs --exclude-backups --exclude-caches \
+  test -s "$app_excludes" || app_excludes=''
+
+  local adir="$(mktemp -d -p "${TMPDIR:-/tmp}" shell-lib-"$(basename "$JOB_NAME")".XXXXXXX)"
+  test -d "$adir" || return 1
+
+  local xname="$(basename "$app_excludes")"
+  tar -zcvf "$adir"/app.tgz --exclude-vcs --exclude-backups --exclude-caches \
+    --exclude $xname --exclude-ignore=$xname --exclude-ignore-recursive=${xname}-recursive \
     -C "$project_root" $extra_tar_items "$@" && \
   mv "$adir"/app.tgz "$archive_target" && \
   du -hs "$archive_target"/app.tgz && \
