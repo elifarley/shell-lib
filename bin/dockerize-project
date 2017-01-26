@@ -9,6 +9,7 @@ generate_dockerfiles() {
   local ptype="$2"
   local base_image="$BASE_IMAGE"
 
+  echo >&2 "Updating '$dockerfile_dir/.dockerignore'..."
   cat >>"$dockerfile_dir"/.dockerignore <<-'EOF'
 **~
 **.DS_Store
