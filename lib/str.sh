@@ -12,7 +12,7 @@ else
   trim() { (set -f; echo $@) ;}
 fi
 
-strcontains() { test -z "${1##*$2*}" ; }; shell_name bash && export -f strcontains
+strcontains() { test -z "${1##*$2*}" ; }; test "$BASH_VERSION" && export -f strcontains
 strendswith() { test ! "${1%%*$2}"; }
 strstartswith() { test ! "${1##$2*}"; }
 charcount() {
