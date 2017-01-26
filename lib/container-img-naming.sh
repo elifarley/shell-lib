@@ -30,18 +30,16 @@ set_img_vars() {
   update_container_props_path
 
   local IMG_NAME="${1:-$JOB_NAME}"; test $# -gt 0 && shift
-  IMG_NAME="$(echo $(getprop_container IMG_NAME '$IMG_NAME') | tr '/ ' '.-')"
+  IMG_NAME="$(getprop_container IMG_NAME '$IMG_NAME' | tr '/ ' '.-')"
 
   local IMG_BUILD_NUMBER="${1:-$BUILD_NUMBER}"; test $# -gt 0 && shift
-  IMG_BUILD_NUMBER="$(getprop_container IMG_BUILD_NUMBER '${IMG_BUILD_NUMBER:-$(userAtHost)}')"
-  IMG_BUILD_NUMBER="$(echo "$IMG_BUILD_NUMBER" | tr '/ ' '.-')"
+  IMG_BUILD_NUMBER="$(getprop_container IMG_BUILD_NUMBER '${IMG_BUILD_NUMBER:-$(userAtHost)}' | tr '/ ' '.-')"
 
   local IMG_CHANGESET="${1:-$CHANGESET}"; test $# -gt 0 && shift
-  IMG_CHANGESET="$(getprop_container IMG_CHANGESET '${IMG_CHANGESET:-$(changeset)}')"
-  IMG_CHANGESET="$(echo "$IMG_CHANGESET" | tr '/ ' '.-')"
+  IMG_CHANGESET="$(getprop_container IMG_CHANGESET '${IMG_CHANGESET:-$(changeset)}' | tr '/ ' '.-')"
 
   local IMG_REPO="$(echo ${1:-$IMG_REPO})"
-  IMG_REPO="$(echo $(getprop_container IMG_REPO '$IMG_REPO') | tr ' ' '-')"
+  IMG_REPO="$(getprop_container IMG_REPO '$IMG_REPO' | tr ' ' '-')"
   test "$IMG_REPO" || {
     cat <<-EOF >&2
 ERROR: "\$IMG_REPO" is empty. You can also create a file named 'container.properties' with content like this:
