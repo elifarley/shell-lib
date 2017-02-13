@@ -10,7 +10,7 @@ update_container_props_path() {
   CONTAINER_PROPERTIES_PATH="$(find .. . -maxdepth 1 -name container.properties)"
   test "$CONTAINER_PROPERTIES_PATH" || CONTAINER_PROPERTIES_PATH=container.properties
   CONTAINER_PROPERTIES_PATH="$(readlink -f "$CONTAINER_PROPERTIES_PATH")"
-  test -s "$CONTAINER_PROPERTIES_PATH" || { echo "Missing file '$CONTAINER_PROPERTIES_PATH'"; return ;}
+  test -s "$CONTAINER_PROPERTIES_PATH" || { echo >&2 "Missing file '$CONTAINER_PROPERTIES_PATH'"; return ;}
   echo >> "$CONTAINER_PROPERTIES_PATH"
 }
 
