@@ -49,6 +49,12 @@ typeof() {
 
 }
 
+# Get a user's home dir or fail if the user doesn't exist
+get_home() {
+  local result; result="$(getent passwd "$1")" || return
+  echo $result | cut -d : -f 6
+}
+
 # Debian GNU/Linux 8 (jessie) [8.5]
 # Ubuntu precise (12.04.5 LTS) [wheezy/sid]
 # Ubuntu 14.04.4 LTS [jessie/sid]
