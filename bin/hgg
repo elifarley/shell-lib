@@ -91,11 +91,11 @@ hg_pull() {
 hg_revert() {   
   case "$@" in  
     '-a')          
-      git reset --hard
+      git read-tree -um @ HEAD^
       ;;           
     '-a -r '*)  
       local rev="$3"; shift 3
-      git reset --hard "$rev" --
+      git read-tree -um @ "$rev" --
       ;;           
     *)             
       echo hg_revert: TODO; return 1
