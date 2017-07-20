@@ -94,18 +94,18 @@ hg_pull() {
 hg_revert() {  
   case "$@" in
     '-a')
-      git checkout HEAD^ '**'
+      git checkout HEAD^ -- '**'
       ;;
     '-a -r '*)
       local rev="$3"; shift 3
-      git checkout "$rev" '**'
+      git checkout "$rev" -- '**'
       ;;
     '-r '*)
       local rev="$2"; shift 2
-      git checkout "$rev" "$@"
+      git checkout "$rev" -- "$@"
       ;;
     *)
-      git checkout HEAD^ "$@"
+      git checkout HEAD^ -- "$@"
   esac           
 }
 
