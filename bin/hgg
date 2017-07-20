@@ -88,18 +88,22 @@ hg_pull() {
   git "${params[@]}"
 }
 
-hg_revert() {   
-  case "$@" in  
-    '-a')          
-      git read-tree -um @ HEAD^
-      ;;           
-    '-a -r '*)  
+hg_revert() {  
+  case "$@" in
+    '-a')
+      git checkout HEAD^ '**'
+      ;;
+    '-a -r '*)
       local rev="$3"; shift 3
-      git read-tree -um @ "$rev" --
-      ;;           
-    *)             
-      echo hg_revert: TODO; return 1
-  esac             
+      git checkout "$rev" '**'
+      ;;
+    '-r '*)
+      local rev="$2"; shift 2
+      git checkout "$rev" "$@"
+      ;;
+    *)
+      git checkout HEAD^ "$@"
+  esac           
 }
 
 hg_status() {
