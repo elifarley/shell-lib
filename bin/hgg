@@ -2,6 +2,7 @@
 # See http://stackoverflow.com/questions/4114095/revert-git-repo-to-a-previous-commit
 # See https://github.com/sympy/sympy/wiki/Git-hg-rosetta-stone
 # See http://stackoverflow.com/questions/1450348/git-equivalents-of-most-common-mercurial-commands
+# https://sethrobertson.github.io/GitFixUm/fixup.html#unpushed
 
 hg_emu() {
   local hgcmd="$1"; shift
