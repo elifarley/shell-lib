@@ -33,6 +33,9 @@ hg_emu() {
     up|update)
       hg_update "$@"
       ;;
+    strip)
+      hg_strip "$@"
+      ;;
     *)
       git $hgcmd "$@"
   esac
@@ -121,6 +124,10 @@ hg_update() {
     *)
       echo hg_revert: TODO; return 1
   esac
+}
+
+hg_strip() {
+  git reset --hard "$1"^
 }
 
 hg_emu "$@"
