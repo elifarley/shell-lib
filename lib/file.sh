@@ -36,7 +36,14 @@ safe_rm() {
 # default separator is /
 ntl() { local separator="${1:-/}"; awk -F"$separator" 'NF>1 {print $(NF-1)}'; }
 
-parentname() { local path="$1"; shift; local separator="$1"; shift; echo $path | ntl "$separator"; }
+parentname_awk() { echo $1 | ntl "$2"; }
+
+parentname() {
+  local path root 2>/dev/null # ignore error in shells without `local`
+  path="${1:-$PWD}"; path="${path%/}"; path="${path%/*}"
+  root="${2:-/}"; test "$root" != "/" && root="${root%/}"
+  test "$path" != "$root" && echo $(basename "$path")
+}
 
 rmdir_if_exists() {
   local p; for p in "$@"; do
