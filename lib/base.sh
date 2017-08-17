@@ -1,5 +1,7 @@
 STDERR() { cat - 1>&2; }
 
+log_tstamp() { while read t; do printf "$(date --iso-8601=s) $t\n"; done ;}
+
 exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
 
 foreach() { local cmd="$1"; shift; for i; do $cmd "$i"; done ;}
