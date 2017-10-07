@@ -1,0 +1,13 @@
+#!/bin/sh
+test "$DEBUG" && set -x
+
+src_folder="$(readlink -f "$1")"; shift
+test "$1" && target_folder="$(readlink -f "$1")" || target_folder="$(readlink -f .)"
+
+basename="$(basename "$src_folder")"
+
+echo "Base name: $basename"
+echo "Target folder: $basename"
+echo "Change to: $(dirname "$src_folder")"
+
+tar -cv -C "$(dirname "$src_folder")" "$basename" | lzip -v -9 -S 250Mi -o "$target_folder"/"$basename".tar
