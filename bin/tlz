@@ -10,4 +10,8 @@ echo "Base name: $basename"
 echo "Target folder: $basename"
 echo "Change to: $(dirname "$src_folder")"
 
-tar -cv -C "$(dirname "$src_folder")" "$basename" | lzip -v -9 -S 250Mi -o "$target_folder"/"$basename".tar
+tar -cv -C "$(dirname "$src_folder")" "$basename" \
+--exclude '**/.DS_Store' \
+| lzip -v -9 \
+--dictionary-size=64Mi --match-length=256 \
+-S 250Mi -o "$target_folder"/"$basename".tar
