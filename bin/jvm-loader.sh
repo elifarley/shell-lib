@@ -1,5 +1,5 @@
 #!/bin/sh
-# See https://wiki.apache.org/tomcat/HowTo/FasterStartUp#Entropy_Source
+# Alternative script: https://github.com/fabric8io-images/run-java-sh/blob/master/fish-pepper/run-java-sh/fp-files/run-java.sh
 
 jvm_loader() {
   local project_root
@@ -16,6 +16,7 @@ jvm_loader() {
   test $count -eq 1 && {
     app_exec="$(find "$project_root"/ -name '*app.jar')"
     echo "[jvm_loader] Loading single jar: '$app_exec'..."
+    # See https://wiki.apache.org/tomcat/HowTo/FasterStartUp#Entropy_Source
     # See http://www.2uo.de/myths-about-urandom/
     exec java \
     -Djava.security.egd=file:/dev/./urandom \
