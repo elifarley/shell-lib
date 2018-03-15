@@ -16,6 +16,7 @@ jvm_loader() {
   test $count -eq 1 && {
     app_exec="$(find "$project_root"/ -name '*app.jar')"
     echo "[jvm_loader] Loading single jar: '$app_exec'..."
+    # See http://www.2uo.de/myths-about-urandom/
     exec java \
     -Djava.security.egd=file:/dev/./urandom \
     -jar "$app_exec" "$@" || return
