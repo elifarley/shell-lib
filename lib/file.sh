@@ -3,7 +3,7 @@ some_file() { local base="$1"; shift; find -H "$base" ! -path "$base" "$@" -prin
 
 dir_full() { local base="$1"; shift; test "$(cd "$base" &>/dev/null && find -H . -maxdepth 1 ! -path . "$@" -print -quit)"; }
 
-dir_not_empty() { test "$(ls -A "$@" 2>/dev/null)" ;}
+dir_not_empty() { test "$(\ls -A "$@" 2>/dev/null)" ;}
 
 dir_empty() { find -H "$1" -maxdepth 0 -empty | read v ;}
 
