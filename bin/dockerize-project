@@ -89,6 +89,9 @@ generate_dockerfile_and_archive() {
       # Gradle builds
       dir_not_empty "$project_root"/build/libs/*.?ar && cp "$project_root"/build/libs/*.?ar "$dockerfile_dir"/
 
+      # 'app' folder
+      dir_not_empty "$project_root"/app/target/*.?ar && cp "$project_root"/app/target/*.?ar "$dockerfile_dir"/
+
       # Remove jar without dependencies if "*-jar-with-dependencies.jar" exists
       test "$(find "$dockerfile_dir"/ -name '*-jar-with-dependencies.jar' -print)" && \
         find "$dockerfile_dir"/ ! -name '*-jar-with-dependencies.jar' -name '*.jar' -exec rm -f {} +
