@@ -1,15 +1,20 @@
 #!/bin/sh
-# Example:
-# github-install.sh elifarley/cross-installer /usr/local xinstall
-
 CMD_BASE="$(readlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
 
-test "$DEBUG" && set -x
+# Example:
+# github-install.sh elifarley/cross-installer /usr/local xinstall
 
 dir_count_nodot() { test -d "$1" && echo $(\ls -Uq "$1" 2>/dev/null | wc -l ) ;}
 
 githubInstall() {
-
+test $(( $# >= 1)) -ne 0 || {
+  echo 'Usage:'
+  echo "$0 <project> {prefix=/usr/local} {executable=bin/*}"
+  echo 'Examples:'
+  echo "$0 elifarley/cross-installer /usr/local xinstall"
+  echo "$0 elifarley/cross-installer"
+  return 1
+}
 local project="$1"; test $# -gt 0 && shift
 local projname="$(basename "$project")"
 test "$projname" || {
@@ -23,16 +28,16 @@ prefix="${1:-/usr/local}"; test $# -gt 0 && shift
 
 executable="$1"; test $# -gt 0 && shift
 
-test "$executable" -a -L "$prefix/bin/$executable" && {
+test -e "$prefix/$projname" -o "$executable" -a -L "$prefix/bin/$executable" && {
   test -z "$FORCE" && {
-    ls -Falk "$prefix/bin/$executable"
+    ls -Falk "$prefix/$projname"
     echo "Previous installation exists. Aborting.
 You can set env var 'FORCE=1' to force installation."
     exit 1
   }
 
-  test "$projname" -a "$executable" && \
-  rm -rf "$prefix/$projname" "$prefix/bin/$executable" || exit
+  test "$projname" && rm -rf "$prefix/$projname"
+  test "$executable" && rm -rf "$prefix/bin/$executable"
 }
 
 mkdir "$prefix/$projname" && tmp="$(mktemp -d)" || exit
@@ -58,7 +63,11 @@ test "$executable" || { # No executable defined ?
     executable="$(basename $(find "$prefix/$projname"/bin -mindepth 1 -name '.*' -prune -o -print -quit))"
 }
 
-test "$executable" \
+test "$executable" && \
   ln -sv ../"$projname/bin/$executable" "$prefix"/bin
 
 }
+
+test "$DEBUG" && set -x
+
+githubInstall "$@"
