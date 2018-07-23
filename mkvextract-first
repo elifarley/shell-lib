@@ -1,0 +1,19 @@
+#!/bin/sh
+
+srcfolder="$1"
+test -e "$srcfolder" || { echo "Invalid path: '$srcfolder'"; exit 1 ;}
+
+for f in "$srcfolder"/*.webm "$srcfolder"/*.mkv ; do
+  f="$(readlink -f "$f")"; test -f "$f" || continue
+
+  codec="$(mkvinfo "$f" | egrep -m1 -o 'Codec\ ID.*' | cut -d' ' -f3)"
+  case "$codec" in
+    A_VORBIS) suffix=ogg;;
+    A_OPUS) suffix=opus;;
+    *) suffix=unknown;;
+  esac
+
+  mkvextract "$f" tracks 0:"${f%.*}".$suffix || {
+          echo "FAILED: '$(basename "$f")'"
+  }
+done
