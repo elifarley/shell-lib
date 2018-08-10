@@ -71,6 +71,15 @@ wait_jboss() {
   wait_str "$server_log" "JBoss .* Started in " "$wait_time"
 }
 
+getLocalIP() {
+  local localIP="$(hostname -I 2>/dev/null | cut -d' ' -f1)"
+  test "$localIP" || localIP="$(hostname -i 2>/dev/null | cut -d' ' -f1)"
+  # On an EC2 instance?
+  test "$localIP" || localIP="$(curl -fsL --connect-timeout 1 http://169.254.169.254/latest/meta-data/local-ipv4)"
+  test "$localIP" && echo $localIP && return
+  ip address show | STDERR; exit 1
+}
+
 pause() { echo 'Press [ENTER] to continue...'; read; }
 ask() { echo -en "$1 "; shift; read "$@"; }
 
