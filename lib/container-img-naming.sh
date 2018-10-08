@@ -29,9 +29,14 @@ set_img_vars() {
     return 1
   }
 
+  echo >&2 "[set_img_vars] IMG_NAME: '$IMG_NAME'"
+  echo >&2 "[set_img_vars] BUILD_NUMBER: '$BUILD_NUMBER'"
+  echo >&2 "[set_img_vars] CHANGESET: '$CHANGESET'"
+  echo >&2 "[set_img_vars] IMG_REPO: '$IMG_REPO'"
+
   update_container_props_path
 
-  echo >&2 "[set_img_vars] JOB_NAME: $JOB_NAME"
+  echo >&2 "[set_img_vars] JOB_NAME: '$JOB_NAME'"
   echo >&2 "[set_img_vars] IMG_NAME will be: '$(getprop_container IMG_NAME '$IMG_NAME' | tr '/ %' '.-.')'..."
 
   local IMG_NAME="${1:-$JOB_NAME}"; test $# -gt 0 && shift
