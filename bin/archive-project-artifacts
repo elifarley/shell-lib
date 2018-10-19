@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-CMD_BASE="$(readlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
+CMD_BASE="$(readlink -f "$0" 2>/dev/null || greadlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
 
 for lib in vcs str container-img-naming
 do . "$CMD_BASE"/../lib/"$lib".sh || exit; done

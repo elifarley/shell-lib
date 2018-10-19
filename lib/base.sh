@@ -1,5 +1,7 @@
 STDERR() { cat - 1>&2; }
 
+readlink_f() { readlink -f "$@" 2>/dev/null || greadlink -f "$@"; }
+
 log_tstamp() { while read t; do printf "$(date --iso-8601=s) $t\n"; done ;}
 
 exec_at_dir() { bash -c 'cd "$1" && shift && "$@"' exec-at-dir "$@"; }
@@ -26,7 +28,7 @@ hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
 # shell_name 'ash*' && echo "Ash or one of its variants"
 # shell_name (prints the shell name when no args)
 shell_name() {
-  local result="$(basename "$(readlink -f /proc/$$/exe)")"
+  local result="$(basename "$(readlink_f /proc/$$/exe)")"
   test "$1" || { test "$result" && echo $result; return ;}
   case "$result" in $1) return;; esac; return 1
 }
