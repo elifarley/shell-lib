@@ -76,8 +76,10 @@ getLocalIP() {
   test "$localIP" || localIP="$(hostname -i 2>/dev/null | cut -d' ' -f1)"
   # On an EC2 instance?
   test "$localIP" || localIP="$(curl -fsL --connect-timeout 1 http://169.254.169.254/latest/meta-data/local-ipv4)"
+  test "$localIP" || localIP="$(ipconfig getifaddr en0 2>/dev/null)"
+  test "$localIP" || localIP="$(ipconfig getifaddr en1 2>/dev/null)"
   test "$localIP" && echo $localIP && return
-  ip address show | STDERR; exit 1
+  ip address show 1>&2; exit 1
 }
 
 pause() { echo 'Press [ENTER] to continue...'; read; }
