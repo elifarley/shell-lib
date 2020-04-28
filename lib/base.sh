@@ -84,3 +84,8 @@ os_version() {
   local asterisk="$(echo "$1" | tr -cd '*')"; test "$asterisk" && asterisk="$1" || asterisk="$1*"
   case "$(echo "$result" | tr '[:upper:]' '[:lower:]')" in $asterisk) return;; esac; return 1
 }
+
+# Number of online processors
+getconf_nproc() {
+  getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1
+}
