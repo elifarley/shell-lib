@@ -20,7 +20,7 @@ detect_project_ruby() {
 }
 
 get_rails_version() {
-  egrep "gem 'rails', '[0-9.]+'" "${1:-.}"/Gemfile | cut -d',' -f2 | tr -d "' \n' '_'"
+  grep -E "gem 'rails', '[0-9.]+'" "${1:-.}"/Gemfile | cut -d',' -f2 | tr -d "' \n' '_'"
 }
 
 detect_project_jvm() {
