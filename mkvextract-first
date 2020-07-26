@@ -6,7 +6,7 @@ test -e "$srcfolder" || { echo "Invalid path: '$srcfolder'"; exit 1 ;}
 for f in "$srcfolder"/*.webm "$srcfolder"/*.mkv ; do
   f="$(readlink -f "$f")"; test -f "$f" || continue
 
-  codec="$(mkvinfo "$f" | egrep -m1 -o 'Codec\ ID.*' | cut -d' ' -f3)"
+  codec="$(mkvinfo "$f" | grep -E -m1 -o 'Codec\ ID.*' | cut -d' ' -f3)"
   case "$codec" in
     A_VORBIS) suffix=ogg;;
     A_OPUS) suffix=opus;;
