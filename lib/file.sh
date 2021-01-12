@@ -5,6 +5,7 @@ dir_full() { local base="$1"; shift; test "$(cd "$base" &>/dev/null && find -H .
 
 dir_not_empty() { test "$(\ls -A "$@" 2>/dev/null)" ;}
 
+# -empty: not supported in BusyBox v1.29.3
 dir_empty() { find -H "$1" -maxdepth 0 -empty | read v ;}
 
 dir_count() { test -d "$1" && echo $(( $(\ls -afq "$1" 2>/dev/null | wc -l )  -2 )) ;}
