@@ -9,7 +9,7 @@ if test "$ZSH_VERSION"; then
     echo ${result#${tmp}}
   }
 else
-  trim() { (set -f; echo $@) ;}
+  trim() (set -f; echo $@)
 fi
 
 strcontains() { test -z "${1##*$2*}" ; }; test "$BASH_VERSION" && export -f strcontains
