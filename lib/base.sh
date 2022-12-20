@@ -1,3 +1,5 @@
+# shellcheck shell=dash
+
 STDERR() { cat - 1>&2; }
 
 readlink_f() { readlink -f "$@" 2>/dev/null || greadlink -f "$@"; }
