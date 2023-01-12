@@ -36,3 +36,15 @@ escape_quotes() {
   done;
   echo $result
 }
+
+printSecret() (set +x
+  local secret="$1"; shift
+  test "$secret" || { echo '!!! EMPTY SECRET !!!'; return ;}
+  local maxReveal=$(( ${#secret} / 4 )) reveal="${1:-5}"
+  test $reveal -gt $maxReveal && reveal=$maxReveal
+  printf '%s (%s[...]%s) Len: %s\n' \
+  "$(printf "$secret" | sha256sum | cut -d' ' -f1)" \
+  "$(printf "$secret" | head -c$(echo $reveal))" \
+  "$(printf "$secret" | tail -c$(echo $reveal))" \
+  "${#secret}"
+)
