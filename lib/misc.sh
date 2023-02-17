@@ -33,6 +33,25 @@ int2b64() { hex2bytes $(printf '%x\n' $1) | base64 | tr -d '\n' ;}
 hex2b64_padded() { pipehex2bytes | base64 | tr -d '\n' | tr '+/' '-_' ;}
 hex2b64() { local r=$(hex2b64_padded); echo ${r%%=*} ;}
 
+# Base36
+int2b36() {
+  local n="$1"; shift
+  local BASE36=$(echo {0..9} {A..Z} | tr -d ' ')
+  for i in $(echo "obase=36; $n" | bc); do
+    printf ${BASE36:$(( 10#$i )):1}
+  done; echo
+}
+
+# Order-Preserving Base58 (OPB58)
+int2b58() {
+  local n="$1"; shift
+  # Omit IOlo
+  local BASE58=$(echo {0..9} {A..H} {J..N} {P..Z} {a..k} {m..n} {p..z} | tr -d ' ')
+  for i in $(echo "obase=58; $n" | bc); do
+    printf ${BASE58:$(( 10#$i )):1}
+  done; echo
+}
+
 # TimeStamp in Decimal
 millistamp() { local n=$(date +%s%N); echo "${n%??????}" ;}
 # TimeStamp in Hex
