@@ -33,16 +33,15 @@ int2b64() { hex2bytes $(printf '%x\n' $1) | base64 | tr -d '\n' ;}
 hex2b64_padded() { pipehex2bytes | base64 | tr -d '\n' | tr '+/' '-_' ;}
 hex2b64() { local r=$(hex2b64_padded); echo ${r%%=*} ;}
 
-# Order-Preserving Base58 (OPB58)
+# Order-Preserving Base58 (OPB58).
+# Also supports negative numbers.
 int2b58() {
   # Omit IOlo
-  local BASE58=$(echo {0..9} {A..H} {J..N} {P..Z} {a..k} {m..n} {p..z} | tr -d ' ')
-  local i n="$1" sign
+  local n="$1" i BASE58=$(echo {0..9} {A..H} {J..N} {P..Z} {a..k} {m..n} {p..z} | tr -d ' ')
   ((n < 0 )) && printf -- '-' && n=$((-n))
   for i in $(echo "obase=58; $n" | bc); do
     printf ${BASE58:$(( 10#$i )):1}
   done; echo
-  local n="$1"; shift
 }
 
 # Base36
