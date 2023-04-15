@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+CMD_BASE="$(readlink -f "$0" 2>/dev/null || greadlink -f "$0")" || CMD_BASE="$0"; CMD_BASE="$(dirname "$CMD_BASE")"
+
+for f in math git; do
+. "$CMD_BASE"/lib/"$f".sh
+done
+
+git log --format='%H|%at|%an:%ae|%s' "$@" \
+| while IFS='|' read rev ts author msg; do
+  sid=$(sid "$ts" "$author" "$msg")
+  git show -s --format="'%an' %s %d" \
+    "$rev" \
+    | sed -E "s/\s*\(#[0-9]+\)\s*//; s/\[[0-9]+-[a-zA-Z0-9]{4}\]//; s!$sid/!!; s/^/$sid /"
+done
