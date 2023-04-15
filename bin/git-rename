@@ -1,0 +1,11 @@
+#!/bin/sh
+currentBranch="$(git rev-parse --abbrev-ref HEAD)"
+test $# != 1 && cat <<EOF && exit 1
+Renames the current branch ($currentBranch) both locally and remotely.
+USAGE:
+git rename <new branch name>
+EOF
+
+newBranch="$1"; shift
+git branch -m "$newBranch" && \
+git push origin :"$currentBranch" "$newBranch"

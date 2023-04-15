@@ -1,0 +1,40 @@
+#!/bin/bash
+
+(
+# Order-Preserving Base58 (OPB58)
+# Omit IOlo
+BASE58=$(echo {0..9} {A..H} {J..N} {P..Z} {a..k} {m..n} {p..z} | tr -d ' ')
+int2b58() {
+  local i n="$1" sign
+  ((n < 0 )) && printf -- '-' && n=$((-n))
+  for i in $(echo "obase=58; $n" | bc); do
+    printf ${BASE58:$(( 10#$i )):1}
+  done; echo
+}
+
+hex2decimal() { printf '%u' "0x$1"; echo ;}
+
+hfrev() {
+  # $(date -d 2023-01-01 +%s) = 1672527600
+  # 1672527600/60 = 27875460
+  local ts="$1" author="$2" pr="$3" \
+  hfrevTS=$(( ts / 60 - 27875460 ))
+  # echo "$ts $author [$pr] $msg"
+  # 58 ** 2 = 3364
+  authorHash=$((
+    $(hex2decimal $(echo "$author" | md5sum | head -c3))
+    % 3364
+  ))
+  printf '%4s.%2s.%04d\n' \
+    "$(int2b58 $hfrevTS)" \
+    "$(int2b58 $authorHash )" \
+    "$pr" \
+    | tr ' ' '0'
+}
+
+while read rev ts author msg; do
+  pr="$(echo "$msg" | sed -En 's/.*\(#([0-9]+)\)$/\1/p')"
+  git log -1 --format="$(hfrev "$ts" "$author" "$pr") %an %s" \
+    "$rev"
+done < <(git log --format='%H %at %an:%ae %s' "$@")
+)
