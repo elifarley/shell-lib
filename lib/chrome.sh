@@ -1,3 +1,4 @@
+# See https://chromedriver.chromium.org/downloads/version-selection
 chromedriver_install() (
   target="${1:-/usr/local/bin}"
   chrome_version=$(chrome --version | tr -c -d '0-9.')
