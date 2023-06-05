@@ -53,7 +53,7 @@ tid() {
     "${TID_PREFIX:+"$(echo "$TID_PREFIX" | tr '[:upper:]' '[:lower:]')"-}" \
     "$tidTS" \
     | tr ' ' '0'
-  test $pr -gt 0 -a -z "$TID_OMIT_PR" && printf '.%04d' \
+  test $pr -gt 0 -a -z "$TID_OMIT_PR" && printf '+%04d' \
     "$pr"
   echo
 }
