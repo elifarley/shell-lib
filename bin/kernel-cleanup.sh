@@ -21,7 +21,7 @@ $current_kernel *** current kernel ***
 EOF
 
 mkdir -p /var/tmp/current-kernel
-echo cp -v /boot/*$current_kernel* /var/tmp/current-kernel
+echo sudo cp -v /boot/*$current_kernel* /var/tmp/current-kernel
 
 # Calculate the limit for the iteration
 ((counter = $(echo "$older_kernels" | grep -c .) - 1))
@@ -30,8 +30,8 @@ echo "$older_kernels" | while read -r kernel; do
   #printf "\n# Removing kernel version %s\n" "$kernel"
   #du -hs /boot/*-$kernel-generic
   test "$kernel" || { echo skip ; continue ;}
-  echo "sudo rm -f /boot/*-$kernel-generic"
+  echo "sudo rm -fv /boot/*-$kernel-generic"
   ((--counter)) || break
 done
 
-exit
+echo "df -h | grep -E '^Filesystem|boot$'"
