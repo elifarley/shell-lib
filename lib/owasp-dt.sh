@@ -154,8 +154,9 @@ sbom_merge_csharp() {
 
 sbom_merge() (
   local out="$1"; shift
-  sbommerge --sbom cyclonedx --format json -o "$out".tmp "$@" >/dev/null \
-  && syft convert "$out".tmp -o cyclonedx-json | \
+  rm -f "$out".tmp
+  sbommerge --sbom cyclonedx --format json -o "$out".tmp "$@" >/dev/null ||:
+  syft -q convert "$out".tmp -o cyclonedx-json | \
     jq -S >"$out" \
   && rm "$out".tmp
 )
