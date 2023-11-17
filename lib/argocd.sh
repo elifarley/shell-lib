@@ -10,17 +10,14 @@ argocd_app_list_names() {
 }
 
 # Loop through each application name and print its image list
-list_images_per_app() { while read -r argo_app; do
-
+list_images_per_app() ( while read -r argo_app; do
   # The list of images usually come from:
   # - .metadata.summary.images
   # -   .status.summary.images
   # Tip: use jq -r 'paths | select(.[-1] == "images")'
   argo_app_json="$(
-    (
-      argocd app get "$argo_app" -o json --loglevel error || \
-        echo >&2 "##### ERROR above: $argo_app"
-    ) | jq -r '{
+    argocd app get "$argo_app" -o json --loglevel error \
+    | jq -r '{
 creationTimestamp: .metadata.creationTimestamp,
 repoURL: .spec.source.repoURL,
 environment: .metadata.labels.environment,
@@ -37,15 +34,15 @@ images: [.. | objects | select(has("images")) | .images[]]
 
   app_slug="$(echo "$argo_app_json" | jq -r '.squad // ""')"
   app_slug="${app_slug:+$app_slug/}${argo_app#cicd-platform/}"
+
   # Print 1 row for Argo app details
   printf "#%s," "$app_slug"
-
   echo "$argo_app_json" | jq -er \
   '. | del(.images) | del(.squad) | [to_entries[] | .value] | @csv' | tr -d '"'
 
   # Print 1 row for each image in the app
   echo "$argo_app_json" | jq -r '.images[]' | sort -u
-done ;}
+done )
 
 # Transform images-per-app into apps-per-image
 as_apps_per_image() {
