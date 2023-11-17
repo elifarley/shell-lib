@@ -4,7 +4,7 @@ dt_get_project_uuid() {
   test "$#" = 2 || return
   local projectName="$1" projectVersion="$2" resp
   resp=$(
-    curl --fail-with-body -LSs -H "X-Api-Key: $DT_API_KEY" \
+    curl --fail-with-body -LSs -H "X-Api-Key: ${DT_API_KEY?}" \
     -G -d name="$projectName" -d version="$projectVersion" \
     "$DT_API_URL/project/lookup"
   ) && \
@@ -23,7 +23,7 @@ dt_download_sbom() {
     echo "### ERROR [$projectName @ $projectVersion] Download SBOM"
     return 1
   }
-  curl --fail-with-body -LSs -H "X-Api-Key: $DT_API_KEY" \
+  curl --fail-with-body -LSs -H "X-Api-Key: ${DT_API_KEY?}" \
   -G -d format=json -d variant=inventory -d download=true \
   "$DT_API_URL/bom/cyclonedx/project/$projectUUID"
 }
@@ -83,7 +83,7 @@ dt_set_tags() {
   tags="$tags${proj:+,$(printf "$tagt" proj "$proj")}"
   tags="$(echo "$tags" | cut -c2-)"
   curl <<EOF -o /dev/null -d@- --fail-with-body -LSs \
-  -H 'Content-Type: application/json' -H "X-Api-Key: $DT_API_KEY" \
+  -H 'Content-Type: application/json' -H "X-Api-Key: ${DT_API_KEY?}" \
   "$DT_API_URL/project"
 {"uuid":"$projectUUID","name":"$projectName","version":"$projectVersion",
 "classifier":"CONTAINER", "tags":[$tags]}
@@ -115,7 +115,7 @@ _dt_set_property() {
   local projectUUID="$1" groupName="$2" key="$3" value="$4" propType="$5"
   curl -X$method <<EOF 2>/dev/null -o /dev/null -d@- --fail-with-body -LSs \
   -w "%{http_code}\n" \
-  -H 'Content-Type: application/json' -H "X-Api-Key: $DT_API_KEY" \
+  -H 'Content-Type: application/json' -H "X-Api-Key: ${DT_API_KEY?}" \
   "$DT_API_URL/project/$projectUUID/property"
 {"groupName": "$groupName","propertyType": "$propType",
 "propertyName": "$key","propertyValue": "$value"}
@@ -132,44 +132,97 @@ dt_imagespec2projectName() {
   echo "$result"
 }
 
+syft_generate_image_sbom() {
+  local imagespec="$1"; shift
+  syft -o cyclonedx-json packages docker:"$imagespec" \
+  | jq -S
+}
+trivy_generate_image_sbom() {
+  local imagespec="$1"; shift
+  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/tmp/cache-trivy:/root/.cache \
+  aquasec/trivy:0.47.0 -q image --format cyclonedx "$imagespec" \
+  | jq -S
+}
+
+sbom_merge_csharp() {
+  local projectName="$1" projectVersion="$2"; shift; shift
+  cyclonedx merge --name "$projectName" --version "$projectVersion" \
+    --hierarchical --output-format json --input-files "$@" \
+    | jq -S >&2
+}
+
+sbom_merge() (
+  local out="$1"; shift
+  sbommerge --sbom cyclonedx --format json -o "$out".tmp "$@" >/dev/null \
+  && syft convert "$out".tmp -o cyclonedx-json | \
+    jq -S >"$out" \
+  && rm "$out".tmp
+)
+
+generate_image_sbom() {
+  local sbom_temp="$1" imagespec="$2" projectName="$3" projectVersion="$4"
+  rm -f "$sbom_temp".json "$sbom_temp".trivy.json "$sbom_temp".syft.json
+
+  if ! docker pull -q "$imagespec" >/dev/null; then
+    docker pull "$imagespec" >&2 && \
+      echo "### ERROR [$projectName @ $projectVersion] Pull worked only at the second attempt for $imagespec" && \
+      return 2
+    echo "### ERROR [$projectName @ $projectVersion] Docker pull '$imagespec'"
+    return 3
+  fi
+
+  syft_generate_image_sbom "$imagespec" >"$sbom_temp".syft.json || {
+    echo "### ERROR [$projectName @ $projectVersion] Syft"
+    return 1
+  }
+  test -s "$sbom_temp".syft.json || {
+    echo "### ERROR [$projectName @ $projectVersion] Syft output is empty"
+    return 4
+  }
+
+  trivy_generate_image_sbom "$imagespec" >"$sbom_temp".trivy.json || {
+    echo "### ERROR [$projectName @ $projectVersion] Trivy"
+    return 1
+  }
+  test -s "$sbom_temp".trivy.json || {
+    echo "### ERROR [$projectName @ $projectVersion] Trivy output is empty"
+    return 4
+  }
+  sbom_merge "$sbom_temp".json "$sbom_temp".syft.json "$sbom_temp".trivy.json || {
+    echo "### ERROR [$projectName @ $projectVersion] SBOM Merge"
+    return 1
+  }
+  test -s "$sbom_temp".json || {
+    echo "### ERROR [$projectName @ $projectVersion] SBOM merge output is empty"
+    return 4
+  }
+  rm "$sbom_temp".*.json
+}
+
 # dt_upload_from_image "$imagespec" "$projectVersion"
 _dt_upload_from_image_previous_imagespec='' # Helps cache SBOM contents
 dt_upload_from_image() {
   local imagespec="$1" projectVersion="$2" \
-  sbom_temp="${3:-/tmp/syft.cyclonedx.json}" projectName
+  sbom_temp="${3:-/tmp/upload-cyclonedx}" projectName
 
   # Check if the repository is in amazonaws.com
   # and remove the repository DNS part
   projectName="$(dt_imagespec2projectName "$imagespec")"
 
   cached_imagespec="## CACHED: $imagespec --> $projectVersion"
-  test ! -s "$sbom_temp" -o \
+  test ! -s "$sbom_temp".json -o \
     "$imagespec" != "$_dt_upload_from_image_previous_imagespec" && {
-    rm -f "$sbom_temp"
     cached_imagespec=''
-    if docker pull -q "$imagespec" >/dev/null; then
-      syft -o cyclonedx-json="$sbom_temp" packages docker:"$imagespec" || {
-        echo "### ERROR [$projectName @ $projectVersion] Syft"
-        return 1
-      }
-    else
-      docker pull "$imagespec" >&2 && \
-        echo "### ERROR [$projectName @ $projectVersion] Pull worked only at the second attempt for $imagespec" && \
-        return 2
-      echo "### ERROR [$projectName @ $projectVersion] Docker pull '$imagespec'"
-      return 3
-    fi
+    generate_image_sbom "$sbom_temp" "$imagespec" \
+      "$projectName" "$projectVersion"  || return
   
     # docker image rm "$imagespec" 2>/dev/null 1>&2 ||:
   } # It was a new imagespec
 
   test "$cached_imagespec" && echo "$cached_imagespec"
-  test -s "$sbom_temp" || {
-    echo "### ERROR [$projectName @ $projectVersion] Syft output is empty"
-    return 4
-  }
   _dt_upload_from_image_previous_imagespec="$imagespec"
-  dt_upload_sbom "$projectName" "$projectVersion" "$sbom_temp"
+  dt_upload_sbom "$projectName" "$projectVersion" "$sbom_temp".json
 }
 
 dt_upload_sbom() {
@@ -177,7 +230,7 @@ dt_upload_sbom() {
   token="$(
     curl --fail-with-body -LSs -X POST "$DT_API_URL"/bom \
      -H 'Content-Type: multipart/form-data' \
-     -H "X-Api-Key: $DT_API_KEY" \
+     -H "X-Api-Key: ${DT_API_KEY?}" \
      -F "autoCreate=true" \
      -F "projectName=$projectName" \
      -F "projectVersion=$projectVersion" \
@@ -187,7 +240,7 @@ dt_upload_sbom() {
     return 5
   }
   # We could show the processing status of the sbom upload:
-  # curl "$DT_API_URL/bom/token/$token" -H "X-Api-Key: $DT_API_KEY"
+  # curl "$DT_API_URL/bom/token/$token" -H "X-Api-Key: ${DT_API_KEY?}"
   echo "$token" | grep -q token || {
     echo "### ERROR [$projectName @ $projectVersion] Upload token: '$token'"
     return 6
@@ -208,7 +261,7 @@ dt_vuln_per_project() {
 
   # Fetch vulnerabilities for the project
   resp=$(
-    curl --fail-with-body -LSs -H "X-Api-Key: $DT_API_KEY" \
+    curl --fail-with-body -LSs -H "X-Api-Key: ${DT_API_KEY?}" \
     "$DT_API_URL/finding/project/$projectUUID"
   ) && \
   csvContent=$(printf '%s' "$resp" | \
@@ -233,7 +286,7 @@ dt_components_per_project() {
 
   # Fetch vulnerabilities for the project
   resp=$(
-    curl --fail-with-body -LSs -H "X-Api-Key: $DT_API_KEY" \
+    curl --fail-with-body -LSs -H "X-Api-Key: ${DT_API_KEY?}" \
     "$DT_API_URL/finding/project/$projectUUID"
   ) && \
   csvContent=$(printf '%s' "$resp" | \
