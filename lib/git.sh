@@ -45,15 +45,16 @@ validate_sid_checksum() {
 
 tid() {
   local ts="$1" msg="$2"
-  local pr="$(echo "$msg" | sed -En 's/.*\(#([0-9]+)\)$/\1/p')" \
-  tidTS=$(date --utc --date "@$ts" +"%y.%j.%H%M")
+  local pr="$(echo "$msg" | sed -En 's/.*\(#([0-9]+)\)$/\1/p')"
   test "$pr" || pr="${PULL_NUMBER:-0}"
+  test "$TID_TIME_FORMAT" || TID_TIME_FORMAT="%y.%j.%H%M"
+  test "$TID_SHORT" && TID_TIME_FORMAT="${TID_TIME_FORMAT//./}"
+  local tidTS=$(date --utc --date "@$ts" +"$TID_TIME_FORMAT")
   # echo "$ts $author [$pr] $msg"
   printf '%s%s' \
     "${TID_PREFIX:+"$(echo "$TID_PREFIX" | tr '[:upper:]' '[:lower:]')"-}" \
     "$tidTS" \
     | tr ' ' '0'
-  test $pr -gt 0 -a -z "$TID_OMIT_PR" && printf '%s%04d' \
-    '-' "$pr"
+  test $pr -gt 0 -a -z "$TID_OMIT_PR" && printf -- '-%04d' "$pr"
   echo
 }
