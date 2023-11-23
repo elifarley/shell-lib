@@ -50,7 +50,7 @@ dt_set_metadata() {
   "$app_created" "$slug" "$environment" "$oam_ctx" "$dest" "$proj" || {
     echo "### ERROR [$projectName @ $projectVersion] Tagging"
   }
-  
+
   dt_set_property "$projectUUID" "image" tag "$imageTag" || {
     echo "### ERROR [$projectName @ $projectVersion] Property"
     return 1
@@ -145,20 +145,9 @@ trivy_generate_image_sbom() {
   | jq -S
 }
 
-sbom_merge_csharp() {
-  local projectName="$1" projectVersion="$2"; shift; shift
-  cyclonedx merge --name "$projectName" --version "$projectVersion" \
-    --hierarchical --output-format json --input-files "$@" \
-    | jq -S >&2
-}
-
 sbom_merge() (
   local out="$1"; shift
-  rm -f "$out".tmp
-  sbommerge --sbom cyclonedx --format json -o "$out".tmp "$@" >/dev/null ||:
-  syft -q convert "$out".tmp -o cyclonedx-json | \
-    jq -S >"$out" \
-  && rm "$out".tmp
+  sbomMerger.py "$@" >"$out"
 )
 
 generate_image_sbom() {
@@ -198,6 +187,7 @@ generate_image_sbom() {
     echo "### ERROR [$projectName @ $projectVersion] SBOM merge output is empty"
     return 4
   }
+
   rm "$sbom_temp".*.json
 }
 
