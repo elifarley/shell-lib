@@ -15,7 +15,6 @@ dt_get_project_uuid() {
   return 1
 }
 
-
 dt_download_sbom() {
   local projectName="$1" projectVersion="$2" projectUUID
   shift; shift
@@ -98,7 +97,7 @@ dt_set_property() {
   resp="$(
     _dt_set_property PUT "$projectUUID" "$groupName" "$key" "$value" "$propType"
   )" && return
- 
+
   if test "$resp" = 409; then
     # Property already existed, so let's just update it
     resp="$(
@@ -106,7 +105,7 @@ dt_set_property() {
     )" && return
   fi
   echo 2>&2 "### [dt_set_property] HTTP status '$resp' for args:" $@
-  return 1  
+  return 1
 }
 
 _dt_set_property() {
@@ -152,7 +151,7 @@ sbom_merge() (
 
 generate_image_sbom() {
   local sbom_temp="$1" imagespec="$2" projectName="$3" projectVersion="$4"
-  rm -f "$sbom_temp".json "$sbom_temp".trivy.json "$sbom_temp".syft.json
+  rm -f "$sbom_temp".json "$sbom_temp".syft.json "$sbom_temp".trivy.json
 
   if ! docker pull -q "$imagespec" >/dev/null; then
     docker pull "$imagespec" >&2 && \
@@ -179,6 +178,12 @@ generate_image_sbom() {
     echo "### ERROR [$projectName @ $projectVersion] Trivy output is empty"
     return 4
   }
+}
+
+generate_image_sbom_merged() {
+  local sbom_temp="$1" imagespec="$2" projectName="$3" projectVersion="$4"
+  generate_image_sbom "$sbom_temp" "$imagespec" "$projectName" "$projectVersion"
+
   sbom_merge "$sbom_temp".json "$sbom_temp".syft.json "$sbom_temp".trivy.json || {
     echo "### ERROR [$projectName @ $projectVersion] SBOM Merge"
     return 1
@@ -205,9 +210,9 @@ dt_upload_from_image() {
   test ! -s "$sbom_temp".json -o \
     "$imagespec" != "$_dt_upload_from_image_previous_imagespec" && {
     cached_imagespec=''
-    generate_image_sbom "$sbom_temp" "$imagespec" \
+    generate_image_sbom_merged "$sbom_temp" "$imagespec" \
       "$projectName" "$projectVersion"  || return
-  
+
     # docker image rm "$imagespec" 2>/dev/null 1>&2 ||:
   } # It was a new imagespec
 
@@ -313,4 +318,3 @@ count_severity_by_squad() { awk -F, '
   }
 ' | sort -t: -k1,1
 }
-
