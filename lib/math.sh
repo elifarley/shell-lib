@@ -1,3 +1,5 @@
+bytes2human() { numfmt --to=iec ;}
+
 hex2decimal() { printf '%u' "0x$1"; echo ;}
 
 # Each element must be a number in [0-255], like '192.168.0.255'
