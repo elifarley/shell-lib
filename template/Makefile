@@ -1,4 +1,4 @@
-.PHONY: all setup test debug dumpreq docker run api loadtest help
+.PHONY: all venv setup test debug dumpreq docker run api loadtest help
 .ONESHELL:
 SHELL := scripts/timed-shell.sh
 # .SHELLFLAGS := -e -o pipefail -c # Make bash fail and report the 1st error in ;-separated lists or pipes.
@@ -14,11 +14,20 @@ export LOADTEST_TYPE _
 all: test run
 	@echo "Running tests and starting the Docker container..."
 
-setup:
-	pip install -r app/requirements.txt
+venv:
+	@test -d .venv && exit
+	python3.12 -m pip install virtualenv && python3.12 -m virtualenv .venv
+
+setup: venv
+	. .venv/bin/activate \
+	&& pip install -r app/requirements.txt python-dotenv pyyaml 'pytest~=7.4' requests_mock | grep -v 'already satisfied'
+	echo "Now, activate the Python virtual env:"
+	echo ". .venv/bin/activate"
 
 test: api
 	@echo "Running pytest..."
+	python --version
+	pytest --version
 	pytest tests
 
 # Run the Flask application in debug mode
@@ -59,6 +68,8 @@ Usage:
 
 Targets:
   all      Run tests and start Docker container (default)
+  venv     Installs a Python virtual env in .venv
+  setup    Installs Python requirements in the current virtual env
   test     Run pytest to execute all tests
   debug    Run Flask application in debug mode
   dumpreq  Dump requests to out/requests.txt
