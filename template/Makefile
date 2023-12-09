@@ -20,7 +20,8 @@ venv:
 
 setup: venv
 	. .venv/bin/activate \
-	&& pip install -r app/requirements.txt python-dotenv pyyaml 'pytest~=7.4' requests_mock | grep -v 'already satisfied'
+	&& pip install -r app/requirements.txt python-dotenv pyyaml 'pytest~=7.4' requests_mock \
+	| grep -v 'already satisfied'
 	echo "Now, activate the Python virtual env:"
 	echo ". .venv/bin/activate"
 
