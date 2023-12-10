@@ -16,7 +16,10 @@ all: test run
 
 venv:
 	@test -d .venv && exit
-	python3.12 -m pip install virtualenv && python3.12 -m virtualenv .venv
+	read -p "How to invoke Python 3.12? (python3.12): " python_cmd
+	python_cmd="$${python_cmd:-python3.12}"
+	$$python_cmd --version || exit
+	$$python_cmd -m pip install virtualenv && $$python_cmd -m virtualenv .venv
 
 setup: venv
 	. .venv/bin/activate \
@@ -29,7 +32,7 @@ test: api
 	@echo "Running pytest..."
 	python --version
 	pytest --version
-	pytest tests
+	pytest -q tests
 
 # Run the Flask application in debug mode
 debug:
@@ -84,4 +87,4 @@ export HELP_MESSAGE
 
 help: SHELL:=/bin/sh
 help:
-	echo "$$HELP_MESSAGE"
+	@echo "$$HELP_MESSAGE"
