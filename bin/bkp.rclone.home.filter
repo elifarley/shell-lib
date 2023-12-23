@@ -26,8 +26,7 @@
 - /snap/**
 - /IdeaProjects/{some*,folders*}/**
 - /apps/{idea*,GoLand*,harbor}**
-- /.local/{share,lib,bin,include,state}**
-+ /.local/share/desktop-directories/**
+- /.local/{lib,bin,include,state}**
+- /.local/share/{Trash,tracker,TabNine,JetBrains,helm}**
 - /bin/{argocd,argo,cyclonedx,docker-compose,buildx,helm,helmfile,clairctl,act,oras}
-- /Documents/{Zoom,}**
 - /Videos/**
