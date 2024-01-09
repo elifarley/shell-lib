@@ -1,10 +1,12 @@
 # shellcheck shell=dash
 curlGithubRaw() (set +x
-  # $1: path. Example: dh-fintech-risk-ml-service/master/.config/deploy/staging/eu-central-1/global/values.yaml
+  # $1: path. Example: project/master/values.yaml
+  # $2: company. If absent, $GH_COMPANY
   gh_path="$1"; shift
-  test "${gh_path:?'Missing value'}"
+  test "${gh_path:?}" || return
+  gh_path="${2:-${GH_COMPANY:?}}/$gh_path"
   echo >&2 "[curlGithubRaw] Path: '$gh_path'"
-  curl -LSs https://x-access-token:"${GITHUB_OAUTH_TOKEN:?'Missing value'}@raw.githubusercontent.com/deliveryhero/$gh_path" \
+  curl -LSs https://x-access-token:"${GITHUB_OAUTH_TOKEN:?}@raw.githubusercontent.com/$gh_path" \
   || {
     printf >&2 '[curlGithubRaw] ERROR! GITHUB_OAUTH_TOKEN sha256: %s\n' "$(printSecret "$GITHUB_OAUTH_TOKEN")"
     return 1

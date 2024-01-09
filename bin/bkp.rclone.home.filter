@@ -1,5 +1,6 @@
 # Root: ~/
 - *~
+- .~*
 - **.hprof
 - java_error*
 - node_modules/**
