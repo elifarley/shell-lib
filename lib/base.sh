@@ -29,6 +29,7 @@ hascmd() { for i in "$@"; do typeof "$i" >/dev/null 2>&1 || return; done ;}
 # Examples:
 # shell_name 'ash*' && echo "Ash or one of its variants"
 # shell_name (prints the shell name when no args)
+# See https://stackoverflow.com/questions/37795808/how-can-a-script-know-which-shell-is-executing-it
 shell_name() {
   local result="$(basename "$(readlink_f /proc/$$/exe)")"
   test "$1" || { test "$result" && echo $result; return ;}
