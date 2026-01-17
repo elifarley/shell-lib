@@ -92,3 +92,13 @@ os_version() {
 getconf_nproc() {
   getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1
 }
+
+# Prepend a path to PATH env var only if it's not already there
+# Usage: path_prepend /some/new/path
+path_prepend() {
+  local dir="$1"
+  case ":$PATH:" in
+    *":$dir:"*) ;;  # already present
+    *) test -d "$dir" && export PATH="$dir${PATH:+:$PATH}" ;;
+  esac
+}
