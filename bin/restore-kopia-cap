@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# restore-kopia-cap: Restore Kopia capabilities after package updates
+#
+# This script restores the CAP_DAC_READ_SEARCH capability on the Kopia binary,
+# which is lost when the kopia package is updated via apt.
+#
+# INSTALLATION:
+#   This file should be symlinked to /usr/local/bin/restore-kopia-cap:
+#     sudo ln -s ~/IdeaProjects/shell-lib/bin/restore-kopia-cap /usr/local/bin/restore-kopia-cap
+#
+# The APT hook at ~/IdeaProjects/shellbase/etc/apt/apt.conf.d/50kopia
+# references this symlink location.
+
+set -euo pipefail
+
+KOPIA_BIN="/usr/bin/kopia"
+DESIRED_CAP="cap_dac_read_search+ep"
+
+# Only act if binary exists
+if [[ ! -f "$KOPIA_BIN" ]]; then
+    exit 0
+fi
+
+# Check current capabilities (getcap returns empty string if no caps set)
+current_caps=$(getcap "$KOPIA_BIN" 2>/dev/null | awk -F'=' '{print $2}' || echo "")
+
+# Restore only if needed (idempotent)
+if [[ "$current_caps" != *"cap_dac_read_search"* ]]; then
+    echo "Restoring CAP_DAC_READ_SEARCH on $KOPIA_BIN"
+    setcap "$DESIRED_CAP" "$KOPIA_BIN"
+fi
+
+exit 0
